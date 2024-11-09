@@ -3,7 +3,7 @@ import 'package:image_picker/image_picker.dart';
 //import 'package:seezme/send_message.dart';
 import 'package:seezme/utils/const.dart';
 //import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+//import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:io';
 
 class ChatScreen extends StatefulWidget {
@@ -16,7 +16,6 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _controller = TextEditingController();
   //final FirebaseAuth _auth = FirebaseAuth.instance;
-  User? _user;
   List<Widget> _drawerItems = [];
   File? _image;
   @override
@@ -141,26 +140,58 @@ class _ChatScreenState extends State<ChatScreen> {
                 decoration: BoxDecoration(
                   color: defaultTheme.primaryColor,
                 ),
-                child: const Align(
-                  alignment: Alignment.centerLeft,
-                  child: Padding(
-                    padding: EdgeInsets.only(left: 18.0),
-                    child: Text(
-                      'Seezme',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 24,
+                child: Row(
+                  mainAxisSize: MainAxisSize.max,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    const Align(
+                      alignment: Alignment.centerLeft,
+                      child: const Padding(
+                        padding: EdgeInsets.only(left: 18.0),
+                        child: Text(
+                          'Seezme',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 24,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
+                    Spacer(), // Boşluk oluşturur
+
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: Padding(
+                        padding: const EdgeInsets.all(18.0),
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.of(context).pushNamed('/profile');
+                            print("right drawer avatar clicked");
+                          },
+                          child: const CircleAvatar(
+                            backgroundImage: NetworkImage(
+                                'https://example.com/profile_image_url'), // Profil fotoğrafı URL'si
+                            radius: 20,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              ..._drawerItems,
+              ListTile(
+                leading: const Icon(Icons.settings),
+                title: const Text('Settings'),
+                onTap: () {
+                  Navigator.of(context).pushNamed('/settings');
+                },
+              ),
               ListTile(
                 leading: const Icon(Icons.add),
                 title: const Text('Add Item'),
                 onTap: _showAddItemDialog,
               ),
+              ..._drawerItems,
             ],
           ),
         ),
@@ -182,15 +213,21 @@ class _ChatScreenState extends State<ChatScreen> {
                         vertical: 4.0, horizontal: 16.0),
                     child: Column(
                       children: [
-                        const Row(
+                        Row(
                           children: [
-                            CircleAvatar(
-                              backgroundImage: NetworkImage(
-                                  'https://example.com/profile_image_url'), // Profil fotoğrafı URL'si
-                              radius: 20,
+                            InkWell(
+                              onTap: () {
+                                //Navigator.of(context).pushNamed('/profile');
+                                print("chat avatar clicked");
+                              },
+                              child: const CircleAvatar(
+                                backgroundImage: NetworkImage(
+                                    'https://example.com/profile_image_url'), // Profil fotoğrafı URL'si
+                                radius: 20,
+                              ),
                             ),
-                            SizedBox(width: 10),
-                            Text(
+                            const SizedBox(width: 10),
+                            const Text(
                               'Username', // Kullanıcı adı
                               style: TextStyle(color: Colors.white70),
                             ),
@@ -217,7 +254,10 @@ class _ChatScreenState extends State<ChatScreen> {
                   Expanded(
                     child: TextField(
                       controller: _controller,
-                      style: TextStyle(color: defaultTheme.primaryColor),
+                      cursorColor: defaultTheme.primaryColor,
+                      style: TextStyle(
+                        color: defaultTheme.primaryColor,
+                      ),
                       decoration: InputDecoration(
                         hintText: 'Send a message...',
                         hintStyle: TextStyle(color: Colors.grey[600]),
@@ -270,7 +310,10 @@ class _ChatScreenState extends State<ChatScreen> {
                                                 });
                                               }
                                             },
-                                            child: const Text('Select Media'),
+                                            child: const Text('Choose an image',
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight
+                                                        .w800)), //_sendMessage,,),
                                           ),
                                         ],
                                       ),
@@ -319,7 +362,9 @@ class _ChatScreenState extends State<ChatScreen> {
                     ),
                     child: IconButton(
                         icon: const Icon(Icons.send, color: Colors.white),
-                        onPressed: () {} //_sendMessage,
+                        onPressed: () {
+                          _controller.clear();
+                        } //todo _sendMessage,
                         ),
                   ),
                 ],

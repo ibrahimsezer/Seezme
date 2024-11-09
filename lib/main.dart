@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:seezme/chat_screen.dart';
+import 'package:seezme/profile.dart';
+import 'package:seezme/settings.dart';
 import 'package:seezme/utils/const.dart';
 
 void main() {
@@ -15,6 +17,10 @@ class MyApp extends StatelessWidget {
       title: 'SeezMe',
       theme: defaultTheme,
       home: const ChatScreen(),
+      routes: {
+        '/settings': (context) => const SettingsScreen(),
+        '/profile': (context) => const ProfileScreen(),
+      },
     );
   }
 }
