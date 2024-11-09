@@ -217,6 +217,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   Expanded(
                     child: TextField(
                       controller: _controller,
+                      style: TextStyle(color: defaultTheme.primaryColor),
                       decoration: InputDecoration(
                         hintText: 'Send a message...',
                         hintStyle: TextStyle(color: Colors.grey[600]),
@@ -275,7 +276,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                       ),
                                       actions: <Widget>[
                                         TextButton(
-                                          child: const Text('Kapat'),
+                                          child: const Text('Close'),
                                           onPressed: () {
                                             Navigator.of(context).pop();
                                             setState(() {
@@ -284,7 +285,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                           },
                                         ),
                                         TextButton(
-                                          child: const Text('Sil'),
+                                          child: const Text('Delete'),
                                           onPressed: () {
                                             setState(() {
                                               _image = null;
@@ -292,7 +293,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                           },
                                         ),
                                         TextButton(
-                                          child: const Text('Gönder'),
+                                          child: const Text('Send'),
                                           onPressed: () {
                                             _sendImage();
                                             setState(() {
@@ -314,7 +315,6 @@ class _ChatScreenState extends State<ChatScreen> {
                   const SizedBox(width: 8),
                   Container(
                     decoration: const BoxDecoration(
-                      color: Colors.blue,
                       shape: BoxShape.circle,
                     ),
                     child: IconButton(
