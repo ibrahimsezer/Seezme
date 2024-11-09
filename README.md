@@ -22,6 +22,18 @@ Seezme is a feature-rich voice and chat messaging application developed in Flutt
 ### 📱 Platform Compatibility
 - **Responsive Design**: Adapts to various screen sizes and orientations to ensure a consistent user experience.
 
+## Gallery
+<table>
+  <tr>
+    <td><img src="lib/assets/logo.jpg" alt="Logo" width="200"/></td>
+    <td><img src="lib/assets/chat.jpg" alt="Chat" width="200"/></td>
+  </tr>
+  <tr>
+    <td><img src="lib/assets/addmedia.jpg" alt="Add Media" width="200"/></td>
+    <td><img src="lib/assets/additem.jpg" alt="Add Item" width="200"/></td>
+  </tr>
+</table>
+
 ## Installation
 
 1. Clone the repository:
