@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
+import 'package:seezme/models/message_model.dart';
 //import 'package:seezme/send_message.dart';
 import 'package:seezme/utils/const.dart';
+import 'package:seezme/widgets/media_message_widget.dart';
 //import 'package:cloud_firestore/cloud_firestore.dart';
 //import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:io';
 
+import 'package:seezme/widgets/message_widget.dart';
+
 class ChatScreen extends StatefulWidget {
-  const ChatScreen({super.key});
+  const ChatScreen({
+    super.key,
+  });
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
@@ -21,45 +28,22 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void initState() {
     super.initState();
-    // _auth.signInAnonymously().then((result) {
-    //   setState(() {
-    //     _user = result.user;
-    //   });
-    // });
   }
 
-  // void _sendMessage() {
-  //   if (_controller.text.isNotEmpty) {
-  //     FirebaseFirestore.instance.collection('messages').add({
-  //       'text': _controller.text,
-  //       'createdAt': Timestamp.now(),
-  //       'userId': _user?.uid,
-  //     });
-  //     _controller.clear();
-  //   }
-  // }
-
-  void _sendImage() {
-    if (_image != null) {
-      // Medya dosyasını sohbet sayfasına gönderme işlemi burada yapılacak
-      // Örneğin, bir mesaj listesine ekleyebilirsiniz
-      print('Media sent: ${_image!.path}');
-      // Medya gönderildikten sonra pop-up'ı kapatın ve _image'ı temizleyin
-      setState(() {
-        _image = null;
-      });
-      Navigator.of(context).pop();
+  void _sendMessage() {
+    if (_controller.text.isNotEmpty) {
+      Provider.of<MessageModel>(context, listen: false)
+          .addMessage(_controller.text);
+      _controller.clear();
     }
   }
 
-  Future<void> _pickImage() async {
-    final pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
+  void _sendImage() {
+    if (_image != null) {
+      Provider.of<MessageModel>(context, listen: false)
+          .addMediaMessage(_image!);
 
-    if (pickedFile != null) {
-      setState(() {
-        _image = File(pickedFile.path);
-      });
+      Navigator.of(context).pop();
     }
   }
 
@@ -69,9 +53,7 @@ class _ChatScreenState extends State<ChatScreen> {
         ListTile(
           leading: Icon(type == 'Chat' ? Icons.chat : Icons.voice_chat),
           title: Text(type),
-          onTap: () {
-            // Butona tıklanınca yapılacak işlemler
-          },
+          onTap: () {},
         ),
       );
     });
@@ -135,8 +117,7 @@ class _ChatScreenState extends State<ChatScreen> {
             padding: EdgeInsets.zero,
             children: [
               Container(
-                height:
-                    100, // Yüksekliği yarıya düşürmek için manuel olarak ayarlayın
+                height: 100,
                 decoration: BoxDecoration(
                   color: defaultTheme.primaryColor,
                 ),
@@ -157,8 +138,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         ),
                       ),
                     ),
-                    Spacer(), // Boşluk oluşturur
-
+                    Spacer(),
                     Align(
                       alignment: Alignment.centerRight,
                       child: Padding(
@@ -170,7 +150,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           },
                           child: const CircleAvatar(
                             backgroundImage: NetworkImage(
-                                'https://example.com/profile_image_url'), // Profil fotoğrafı URL'si
+                                'https://example.com/profile_image_url'),
                             radius: 20,
                           ),
                         ),
@@ -199,53 +179,21 @@ class _ChatScreenState extends State<ChatScreen> {
         body: Column(
           children: [
             Expanded(
-              child: ListView.builder(
-                reverse: true,
-                itemCount: 10, // specify the number of items
-                itemBuilder: (context, index) {
-                  return Container(
-                    decoration: BoxDecoration(
-                      color: txtBgColor,
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                    padding: const EdgeInsets.all(8.0),
-                    margin: const EdgeInsets.symmetric(
-                        vertical: 4.0, horizontal: 16.0),
-                    child: Column(
-                      children: [
-                        Row(
-                          children: [
-                            InkWell(
-                              onTap: () {
-                                //Navigator.of(context).pushNamed('/profile');
-                                print("chat avatar clicked");
-                              },
-                              child: const CircleAvatar(
-                                backgroundImage: NetworkImage(
-                                    'https://example.com/profile_image_url'), // Profil fotoğrafı URL'si
-                                radius: 20,
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            const Text(
-                              'Username', // Kullanıcı adı
-                              style: TextStyle(color: Colors.white70),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Text(
-                              'Item $index',
-                              style: const TextStyle(color: Colors.white70),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
+              child: Consumer<MessageModel>(
+                  builder: (context, messageModel, child) {
+                return ListView.builder(
+                  reverse: false,
+                  itemCount: messageModel.messages.length,
+                  itemBuilder: (context, index) {
+                    final message = messageModel.messages[index];
+                    if (message is String) {
+                      return MessageWidget(message: message);
+                    } else if (message is File) {
+                      return MediaMessageWidget(media: message);
+                    }
+                  },
+                );
+              }),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -312,8 +260,8 @@ class _ChatScreenState extends State<ChatScreen> {
                                             },
                                             child: const Text('Choose an image',
                                                 style: TextStyle(
-                                                    fontWeight: FontWeight
-                                                        .w800)), //_sendMessage,,),
+                                                    fontWeight:
+                                                        FontWeight.w800)),
                                           ),
                                         ],
                                       ),
@@ -339,9 +287,6 @@ class _ChatScreenState extends State<ChatScreen> {
                                           child: const Text('Send'),
                                           onPressed: () {
                                             _sendImage();
-                                            setState(() {
-                                              _image = null;
-                                            });
                                           },
                                         ),
                                       ],
@@ -363,6 +308,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     child: IconButton(
                         icon: const Icon(Icons.send, color: Colors.white),
                         onPressed: () {
+                          _sendMessage();
                           _controller.clear();
                         } //todo _sendMessage,
                         ),
