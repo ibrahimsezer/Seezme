@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:seezme/send_message.dart';
+import 'package:image_picker/image_picker.dart';
+//import 'package:seezme/send_message.dart';
 import 'package:seezme/utils/const.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+//import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:io';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -13,28 +15,52 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _controller = TextEditingController();
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  //final FirebaseAuth _auth = FirebaseAuth.instance;
   User? _user;
   List<Widget> _drawerItems = [];
-
+  File? _image;
   @override
   void initState() {
     super.initState();
-    _auth.signInAnonymously().then((result) {
-      setState(() {
-        _user = result.user;
-      });
-    });
+    // _auth.signInAnonymously().then((result) {
+    //   setState(() {
+    //     _user = result.user;
+    //   });
+    // });
   }
 
-  void _sendMessage() {
-    if (_controller.text.isNotEmpty) {
-      FirebaseFirestore.instance.collection('messages').add({
-        'text': _controller.text,
-        'createdAt': Timestamp.now(),
-        'userId': _user?.uid,
+  // void _sendMessage() {
+  //   if (_controller.text.isNotEmpty) {
+  //     FirebaseFirestore.instance.collection('messages').add({
+  //       'text': _controller.text,
+  //       'createdAt': Timestamp.now(),
+  //       'userId': _user?.uid,
+  //     });
+  //     _controller.clear();
+  //   }
+  // }
+
+  void _sendImage() {
+    if (_image != null) {
+      // Medya dosyasını sohbet sayfasına gönderme işlemi burada yapılacak
+      // Örneğin, bir mesaj listesine ekleyebilirsiniz
+      print('Media sent: ${_image!.path}');
+      // Medya gönderildikten sonra pop-up'ı kapatın ve _image'ı temizleyin
+      setState(() {
+        _image = null;
       });
-      _controller.clear();
+      Navigator.of(context).pop();
+    }
+  }
+
+  Future<void> _pickImage() async {
+    final pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        _image = File(pickedFile.path);
+      });
     }
   }
 
@@ -202,8 +228,86 @@ class _ChatScreenState extends State<ChatScreen> {
                         fillColor: Colors.grey[200],
                         contentPadding: const EdgeInsets.symmetric(
                             vertical: 10.0, horizontal: 20.0),
-                        prefixIcon:
-                            Icon(Icons.message, color: Colors.grey[600]),
+                        prefixIcon: IconButton(
+                          icon: Icon(Icons.add, color: Colors.grey[600]),
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return StatefulBuilder(
+                                  builder: (context, setState) {
+                                    return AlertDialog(
+                                      title: const Text('Add a media'),
+                                      content: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: <Widget>[
+                                          const SizedBox(height: 20),
+                                          _image == null
+                                              ? const Text('No image selected.')
+                                              : Image.file(
+                                                  _image!,
+                                                  width: MediaQuery.of(context)
+                                                          .size
+                                                          .width *
+                                                      0.25,
+                                                  height: MediaQuery.of(context)
+                                                          .size
+                                                          .height *
+                                                      0.25,
+                                                  fit: BoxFit.contain,
+                                                ),
+                                          TextButton(
+                                            onPressed: () async {
+                                              final pickedFile =
+                                                  await ImagePicker().pickImage(
+                                                      source:
+                                                          ImageSource.gallery);
+                                              if (pickedFile != null) {
+                                                setState(() {
+                                                  _image =
+                                                      File(pickedFile.path);
+                                                });
+                                              }
+                                            },
+                                            child: const Text('Select Media'),
+                                          ),
+                                        ],
+                                      ),
+                                      actions: <Widget>[
+                                        TextButton(
+                                          child: const Text('Kapat'),
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                            setState(() {
+                                              _image = null;
+                                            });
+                                          },
+                                        ),
+                                        TextButton(
+                                          child: const Text('Sil'),
+                                          onPressed: () {
+                                            setState(() {
+                                              _image = null;
+                                            });
+                                          },
+                                        ),
+                                        TextButton(
+                                          child: const Text('Gönder'),
+                                          onPressed: () {
+                                            _sendImage();
+                                            setState(() {
+                                              _image = null;
+                                            });
+                                          },
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              },
+                            );
+                          },
+                        ),
                       ),
                     ),
                   ),
@@ -214,9 +318,9 @@ class _ChatScreenState extends State<ChatScreen> {
                       shape: BoxShape.circle,
                     ),
                     child: IconButton(
-                      icon: const Icon(Icons.send, color: Colors.white),
-                      onPressed: _sendMessage,
-                    ),
+                        icon: const Icon(Icons.send, color: Colors.white),
+                        onPressed: () {} //_sendMessage,
+                        ),
                   ),
                 ],
               ),
