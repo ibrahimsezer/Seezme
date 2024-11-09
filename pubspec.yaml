@@ -1,5 +1,5 @@
 name: seezme
-description: "A new Flutter project."
+description: "Seezme is a feature-rich voice and chat messaging application developed in Flutter."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -40,11 +40,16 @@ dependencies:
   firebase_auth: ^5.3.1
   firebase_core: ^3.6.0
   image_picker: ^0.8.4+8
+  flutter_launcher_icons: ^0.14.1
+
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "lib/assets/logotransparent.png"
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
   # activated in the `analysis_options.yaml` file located at the root of your
@@ -64,10 +69,13 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
-  #   - images/a_dot_ham.jpeg
-
+  assets:
+    - lib\assets\logosquare.jpeg
+    - lib\assets\logotransparent.png
+    - lib\assets\logo.jpg
+    - lib\assets\chat.jpg
+    - lib\assets\addmedia.jpg
+    - lib\assets\additem.jpg
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 

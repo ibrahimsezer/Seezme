@@ -39,11 +39,19 @@ class MessageWidget extends StatelessWidget {
               ),
             ],
           ),
-          Row(
+          Column(
             children: [
-              Text(
-                message,
-                style: const TextStyle(color: Colors.white70),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    message,
+                    style: const TextStyle(color: Colors.white70),
+                    maxLines: null,
+                    overflow: TextOverflow.visible,
+                  ),
+                ),
               ),
             ],
           ),

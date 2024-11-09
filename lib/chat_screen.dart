@@ -22,6 +22,8 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _controller = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
+
   //final FirebaseAuth _auth = FirebaseAuth.instance;
   List<Widget> _drawerItems = [];
   File? _image;
@@ -30,11 +32,19 @@ class _ChatScreenState extends State<ChatScreen> {
     super.initState();
   }
 
+  @override
+  void dispose() {
+    _controller.dispose();
+    _scrollController.dispose();
+    super.dispose();
+  }
+
   void _sendMessage() {
     if (_controller.text.isNotEmpty) {
       Provider.of<MessageModel>(context, listen: false)
           .addMessage(_controller.text);
       _controller.clear();
+      _scrollToBottom();
     }
   }
 
@@ -42,8 +52,18 @@ class _ChatScreenState extends State<ChatScreen> {
     if (_image != null) {
       Provider.of<MessageModel>(context, listen: false)
           .addMediaMessage(_image!);
-
+      _scrollToBottom();
       Navigator.of(context).pop();
+    }
+  }
+
+  void _scrollToBottom() {
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
     }
   }
 
@@ -182,6 +202,7 @@ class _ChatScreenState extends State<ChatScreen> {
               child: Consumer<MessageModel>(
                   builder: (context, messageModel, child) {
                 return ListView.builder(
+                  controller: _scrollController,
                   reverse: false,
                   itemCount: messageModel.messages.length,
                   itemBuilder: (context, index) {
@@ -191,6 +212,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     } else if (message is File) {
                       return MediaMessageWidget(media: message);
                     }
+                    return null;
                   },
                 );
               }),

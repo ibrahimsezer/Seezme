@@ -47,7 +47,7 @@ class MediaMessageWidget extends StatelessWidget {
               Image.file(
                 media,
                 width: MediaQuery.of(context).size.width * 0.5,
-                height: MediaQuery.of(context).size.width * 0.50,
+                height: MediaQuery.of(context).size.width * 1,
                 fit: BoxFit.contain,
               ),
             ],
