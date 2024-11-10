@@ -52,38 +52,55 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image(
-                height: 200,
-                width: 200,
-                image: AssetImage(logoPath),
-                fit: BoxFit.contain,
-              ),
-              CustomTextField(
-                controller: _usernameController,
-                icon: Icons.person,
-              ),
-              const SizedBox(height: 16.0),
-              CustomTextField(
-                icon: Icons.lock,
-                controller: _passwordController,
-                obscureText: true,
-              ),
-              const SizedBox(height: 16.0),
-              ElevatedButton(
-                onPressed: _login,
-                child: const Text('Login'),
-              ),
-              const SizedBox(height: 16.0),
-              ElevatedButton(
-                onPressed: _handleGoogleSignIn,
-                child: const Text('Login with Google'),
-              ),
-            ],
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image(
+                  height: 200,
+                  width: 200,
+                  image: AssetImage(logoPath),
+                  fit: BoxFit.contain,
+                ),
+                CustomTextField(
+                  controller: _usernameController,
+                  icon: Icons.person,
+                  hintText: 'Username or Email',
+                ),
+                const SizedBox(height: 16.0),
+                CustomTextField(
+                  icon: Icons.lock,
+                  controller: _passwordController,
+                  obscureText: true,
+                  hintText: 'Password',
+                ),
+                const SizedBox(height: 16.0),
+                ElevatedButton(
+                  onPressed: _login,
+                  child: const Text('Login'),
+                ),
+                const SizedBox(height: 16.0),
+                ElevatedButton(
+                  onPressed: _handleGoogleSignIn,
+                  child: const Text('Login with Google'),
+                ),
+                const SizedBox(height: 16.0),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).pushNamed('/register');
+                  },
+                  child: const Text(
+                    'Don\'t have an account? Register here',
+                    style: TextStyle(
+                      color: Colors.blue,
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

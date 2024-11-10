@@ -1,8 +1,6 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:seezme/core/models/message_model.dart';
 import 'package:seezme/core/providers/message_provider.dart';
 import 'package:seezme/core/utility/constans/const.dart';
 
