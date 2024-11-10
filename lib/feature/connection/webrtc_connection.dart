@@ -3,6 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:provider/provider.dart';
+import 'webrtc_state.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -36,28 +38,19 @@ class _WebRTCConnectionState extends State<WebRTCConnection> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   RTCPeerConnection? _peerConnection;
   MediaStream? _localStream;
-  RTCVideoRenderer _localRenderer = RTCVideoRenderer();
-  RTCVideoRenderer _remoteRenderer = RTCVideoRenderer();
   String? _roomId;
   bool _isCaller = false;
 
   @override
   void initState() {
     super.initState();
-    _initializeRenderers();
-  }
-
-  Future<void> _initializeRenderers() async {
-    await _localRenderer.initialize();
-    await _remoteRenderer.initialize();
+    Provider.of<WebRTCState>(context, listen: false).initializeRenderers();
   }
 
   @override
   void dispose() {
     _peerConnection?.close();
     _localStream?.dispose();
-    _localRenderer.dispose();
-    _remoteRenderer.dispose();
     super.dispose();
   }
 
@@ -120,15 +113,20 @@ class _WebRTCConnectionState extends State<WebRTCConnection> {
 
   Future<RTCPeerConnection> _createPeerConnection() async {
     final configuration = <String, dynamic>{
-      'iceServers': [
-        {'urls': 'stun:stun.l.google.com:19302'},
+      "iceServers": [
+        {"url": 'stun:stun.l.google.com:19302'},
+        {"url": 'stun:stun1.l.google.com:19302'},
+        {"url": 'stun:stun2.l.google.com:19302'},
+        {"url": 'stun:stun3.l.google.com:19302'},
+        {"url": 'stun:stun4.l.google.com:19302'},
       ]
     };
 
     final pc = await createPeerConnection(configuration);
     _localStream = await navigator.mediaDevices
         .getUserMedia({'video': true, 'audio': true});
-    _localRenderer.srcObject = _localStream;
+    Provider.of<WebRTCState>(context, listen: false).localRenderer.srcObject =
+        _localStream;
 
     _localStream!.getTracks().forEach((track) {
       pc.addTrack(track, _localStream!);
@@ -136,9 +134,8 @@ class _WebRTCConnectionState extends State<WebRTCConnection> {
 
     pc.onTrack = (event) {
       if (event.track.kind == 'video' || event.track.kind == 'audio') {
-        setState(() {
-          _remoteRenderer.srcObject = event.streams.first;
-        });
+        Provider.of<WebRTCState>(context, listen: false)
+            .setRemoteRenderer(event.streams.first);
       }
     };
 
@@ -181,6 +178,8 @@ class _WebRTCConnectionState extends State<WebRTCConnection> {
 
   @override
   Widget build(BuildContext context) {
+    final webRTCState = Provider.of<WebRTCState>(context);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('WebRTC Video Chat Room'),
@@ -217,13 +216,13 @@ class _WebRTCConnectionState extends State<WebRTCConnection> {
                 Container(
                   width: 100,
                   height: 100,
-                  child: RTCVideoView(_localRenderer, mirror: true),
+                  child: RTCVideoView(webRTCState.localRenderer, mirror: true),
                 ),
-              if (_remoteRenderer.srcObject != null)
+              if (webRTCState.remoteRenderer.srcObject != null)
                 Container(
                   width: 100,
                   height: 100,
-                  child: RTCVideoView(_remoteRenderer),
+                  child: RTCVideoView(webRTCState.remoteRenderer),
                 ),
             ],
           ),

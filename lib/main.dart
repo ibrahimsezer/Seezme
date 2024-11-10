@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:seezme/feature/chat_screen.dart';
 import 'package:seezme/core/providers/message_provider.dart';
 import 'package:seezme/feature/connection/webrtc_connection.dart';
+import 'package:seezme/feature/connection/webrtc_state.dart';
 import 'package:seezme/feature/login/login.dart';
 import 'package:seezme/feature/profile/profile.dart';
 import 'package:seezme/feature/register/register.dart';
@@ -17,6 +18,7 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => MessageProvider()),
+        ChangeNotifierProvider(create: (_) => WebRTCState()),
       ],
       child: const MyApp(),
     ),
@@ -38,7 +40,7 @@ class MyApp extends StatelessWidget {
         '/profile': (context) => const ProfileScreen(),
         '/login': (context) => const LoginPage(),
         '/register': (context) => const RegisterPage(),
-        '/webrtc_connection': (context) => const WebRTCConnection(),
+        '/webrtc_connection': (context) => WebRTCConnection(),
       },
     );
   }
