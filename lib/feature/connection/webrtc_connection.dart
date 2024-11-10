@@ -1,6 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:firebase_core/firebase_core.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Flutter WebRTC Room',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: const WebRTCConnection(),
+    );
+  }
+}
 
 class WebRTCConnection extends StatefulWidget {
   const WebRTCConnection({super.key});
@@ -10,26 +33,27 @@ class WebRTCConnection extends StatefulWidget {
 }
 
 class _WebRTCConnectionState extends State<WebRTCConnection> {
-  final TextEditingController _channelController = TextEditingController();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
   RTCPeerConnection? _peerConnection;
   MediaStream? _localStream;
   RTCVideoRenderer _localRenderer = RTCVideoRenderer();
   RTCVideoRenderer _remoteRenderer = RTCVideoRenderer();
-  bool _isInCall = false;
-  String? _channelId;
+  String? _roomId;
+  bool _isCaller = false;
 
   @override
   void initState() {
     super.initState();
-    _localRenderer.initialize();
-    _remoteRenderer.initialize();
+    _initializeRenderers();
+  }
+
+  Future<void> _initializeRenderers() async {
+    await _localRenderer.initialize();
+    await _remoteRenderer.initialize();
   }
 
   @override
   void dispose() {
-    _channelController.dispose();
     _peerConnection?.close();
     _localStream?.dispose();
     _localRenderer.dispose();
@@ -37,138 +61,171 @@ class _WebRTCConnectionState extends State<WebRTCConnection> {
     super.dispose();
   }
 
-  Future<void> _initiateCall(String channelId) async {
-    _localStream = await navigator.mediaDevices.getUserMedia({
-      'video': true,
-      'audio': true,
-    });
-    _localRenderer.srcObject = _localStream;
+  Future<void> _createRoom() async {
+    _isCaller = true;
+    _peerConnection = await _createPeerConnection();
 
-    final config = <String, dynamic>{
+    final offer = await _peerConnection!.createOffer();
+    await _peerConnection!.setLocalDescription(offer);
+
+    final roomRef = await _firestore.collection('rooms').add({
+      'offer': {'type': offer.type, 'sdp': offer.sdp}
+    });
+    _roomId = roomRef.id;
+
+    setState(() {
+      _roomId = roomRef.id;
+    });
+
+    roomRef.snapshots().listen((snapshot) async {
+      final data = snapshot.data();
+      if (_peerConnection!.getRemoteDescription() == null &&
+          data != null &&
+          data.containsKey('answer')) {
+        final answer = RTCSessionDescription(
+            data['answer']['sdp'], data['answer']['type']);
+        await _peerConnection!.setRemoteDescription(answer);
+      }
+    });
+
+    _collectIceCandidates(
+        roomRef, _peerConnection!, 'offerCandidates', 'answerCandidates');
+  }
+
+  Future<void> _joinRoom(String roomId) async {
+    final roomRef = _firestore.collection('rooms').doc(roomId);
+    final roomSnapshot = await roomRef.get();
+
+    if (!roomSnapshot.exists) {
+      print("Room does not exist.");
+      return;
+    }
+
+    _peerConnection = await _createPeerConnection();
+
+    final offer = roomSnapshot.data()!['offer'];
+    await _peerConnection!.setRemoteDescription(
+        RTCSessionDescription(offer['sdp'], offer['type']));
+
+    final answer = await _peerConnection!.createAnswer();
+    await _peerConnection!.setLocalDescription(answer);
+
+    await roomRef.update({
+      'answer': {'type': answer.type, 'sdp': answer.sdp}
+    });
+
+    _collectIceCandidates(
+        roomRef, _peerConnection!, 'answerCandidates', 'offerCandidates');
+  }
+
+  Future<RTCPeerConnection> _createPeerConnection() async {
+    final configuration = <String, dynamic>{
       'iceServers': [
         {'urls': 'stun:stun.l.google.com:19302'},
       ]
     };
 
-    _peerConnection = await createPeerConnection(config);
+    final pc = await createPeerConnection(configuration);
+    _localStream = await navigator.mediaDevices
+        .getUserMedia({'video': true, 'audio': true});
+    _localRenderer.srcObject = _localStream;
 
-    // Add each track from the local stream individually
-    for (var track in _localStream!.getTracks()) {
-      await _peerConnection!.addTrack(track, _localStream!);
-    }
+    _localStream!.getTracks().forEach((track) {
+      pc.addTrack(track, _localStream!);
+    });
 
-    _peerConnection!.onIceCandidate = (candidate) {
-      if (candidate != null) {
-        _firestore.collection('channels/$channelId/ice_candidates').add({
-          'candidate': candidate.toMap(),
-        });
-      }
-    };
-
-    _peerConnection!.onTrack = (RTCTrackEvent event) {
-      if (event.track.kind == 'video') {
+    pc.onTrack = (event) {
+      if (event.track.kind == 'video' || event.track.kind == 'audio') {
         setState(() {
           _remoteRenderer.srcObject = event.streams.first;
         });
       }
     };
 
-    final offer = await _peerConnection!.createOffer();
-    await _peerConnection!.setLocalDescription(offer);
-    await _firestore.collection('channels').doc(channelId).set({
-      'offer': offer.toMap(),
-    });
+    return pc;
   }
 
-  Future<void> _joinCall(String channelId) async {
-    final channel = _firestore.collection('channels').doc(channelId);
-    final data = await channel.get();
+  void _collectIceCandidates(
+      DocumentReference roomRef,
+      RTCPeerConnection peerConnection,
+      String localCandidateCollection,
+      String remoteCandidateCollection) {
+    final candidatesCollection = roomRef.collection(localCandidateCollection);
 
-    if (!data.exists) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Channel does not exist')),
-      );
-      return;
-    }
+    peerConnection.onIceCandidate = (event) {
+      if (event.candidate != null) {
+        candidatesCollection.add({
+          'candidate': (event.candidate as RTCIceCandidate).candidate,
+          'sdpMid': (event.candidate as RTCIceCandidate).sdpMid,
+          'sdpMLineIndex': (event.candidate as RTCIceCandidate).sdpMLineIndex,
+        });
+      }
+    };
 
-    final offer = data['offer'];
-    await _peerConnection!.setRemoteDescription(RTCSessionDescription(
-      offer['sdp'],
-      offer['type'],
-    ));
-
-    final answer = await _peerConnection!.createAnswer();
-    await _peerConnection!.setLocalDescription(answer);
-
-    await channel.update({
-      'answer': answer.toMap(),
-    });
-
-    // Listen for ICE candidates
-    channel.collection('ice_candidates').snapshots().listen((snapshot) {
-      for (var doc in snapshot.docs) {
-        final candidate = doc['candidate'];
-        _peerConnection!.addCandidate(
-          RTCIceCandidate(
-            candidate['candidate'],
-            candidate['sdpMid'],
-            candidate['sdpMLineIndex'],
-          ),
-        );
+    roomRef
+        .collection(remoteCandidateCollection)
+        .snapshots()
+        .listen((snapshot) {
+      for (var doc in snapshot.docChanges) {
+        if (doc.type == DocumentChangeType.added) {
+          final data = doc.doc.data();
+          if (data != null) {
+            final candidate = RTCIceCandidate(
+                data['candidate'], data['sdpMid'], data['sdpMLineIndex']);
+            peerConnection.addCandidate(candidate);
+          }
+        }
       }
     });
-  }
-
-  void _toggleCall() async {
-    if (_isInCall) {
-      await _peerConnection?.close();
-      _localStream?.dispose();
-      _remoteRenderer.srcObject = null;
-      setState(() {
-        _isInCall = false;
-      });
-    } else {
-      final channelId = _channelController.text;
-      await _initiateCall(channelId);
-      setState(() {
-        _isInCall = true;
-        _channelId = channelId;
-      });
-    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('WebRTC Video Chat'),
+        title: const Text('WebRTC Video Chat Room'),
       ),
       body: Column(
         children: [
-          TextField(
-            controller: _channelController,
-            decoration: const InputDecoration(
-              labelText: 'Channel ID',
+          if (_roomId == null) ...[
+            ElevatedButton(
+              onPressed: _createRoom,
+              child: const Text("Create Room"),
             ),
-          ),
-          Expanded(
-            child: Stack(
-              children: [
-                if (_localStream != null)
-                  RTCVideoView(
-                    _localRenderer,
-                    mirror: true,
-                  ),
-                if (_remoteRenderer.srcObject != null)
-                  RTCVideoView(
-                    _remoteRenderer,
-                  ),
-              ],
+            TextField(
+              onSubmitted: (value) {
+                _joinRoom(value);
+              },
+              decoration:
+                  const InputDecoration(labelText: 'Enter Room ID to Join'),
             ),
-          ),
-          ElevatedButton(
-            onPressed: _toggleCall,
-            child: Text(_isInCall ? 'End Call' : 'Start Call'),
+          ] else
+            GestureDetector(
+              child: Text("Current Room ID: $_roomId"),
+              onLongPress: () {
+                if (_roomId != null) {
+                  Clipboard.setData(ClipboardData(text: _roomId!));
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Room ID copied to clipboard')),
+                  );
+                }
+              },
+            ),
+          Row(
+            children: [
+              if (_localStream != null)
+                Container(
+                  width: 100,
+                  height: 100,
+                  child: RTCVideoView(_localRenderer, mirror: true),
+                ),
+              if (_remoteRenderer.srcObject != null)
+                Container(
+                  width: 100,
+                  height: 100,
+                  child: RTCVideoView(_remoteRenderer),
+                ),
+            ],
           ),
         ],
       ),
