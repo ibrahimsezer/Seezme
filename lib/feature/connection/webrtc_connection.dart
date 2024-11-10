@@ -20,6 +20,7 @@ class _WebRTCConnectionState extends State<WebRTCConnection> {
   @override
   void initState() {
     super.initState();
+    _requestPermissions();
     _initializeRenderers();
     _createPeerConnection().then((pc) {
       _peerConnection = pc;
@@ -52,6 +53,7 @@ class _WebRTCConnectionState extends State<WebRTCConnection> {
       'iceServers': [
         {'urls': 'stun:stun.l.google.com:19302'},
       ],
+      'sdpSemantics': 'unified-plan', // Unified Plan kullanımı
     };
 
     final pc = await createPeerConnection(config);
@@ -60,8 +62,10 @@ class _WebRTCConnectionState extends State<WebRTCConnection> {
       _firestore.collection('candidates').add(candidate.toMap());
     };
 
-    pc.onAddStream = (stream) {
-      _remoteRenderer.srcObject = stream;
+    pc.onTrack = (event) {
+      if (event.streams.isNotEmpty) {
+        _remoteRenderer.srcObject = event.streams[0];
+      }
     };
 
     _localStream = await navigator.mediaDevices.getUserMedia({
@@ -69,7 +73,11 @@ class _WebRTCConnectionState extends State<WebRTCConnection> {
       'video': true,
     });
 
-    pc.addStream(_localStream!);
+    // addTrack() kullanımı
+    for (var track in _localStream!.getTracks()) {
+      pc.addTrack(track, _localStream!);
+    }
+
     _localRenderer.srcObject = _localStream;
 
     return pc;
