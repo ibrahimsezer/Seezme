@@ -2,8 +2,9 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:seezme/models/message_model.dart';
-import 'package:seezme/utils/const.dart';
+import 'package:seezme/core/models/message_model.dart';
+import 'package:seezme/core/providers/message_provider.dart';
+import 'package:seezme/core/utility/constans/const.dart';
 
 class MediaMessageWidget extends StatelessWidget {
   final File media;
@@ -34,7 +35,7 @@ class MediaMessageWidget extends StatelessWidget {
                 TextButton(
                   child: const Text('Delete'),
                   onPressed: () {
-                    Provider.of<MessageModel>(context, listen: false)
+                    Provider.of<MessageProvider>(context, listen: false)
                         .removeMessage(index);
                     Navigator.of(context).pop();
                   },

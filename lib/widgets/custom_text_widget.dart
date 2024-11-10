@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:seezme/utils/const.dart';
+import 'package:seezme/core/utility/constans/const.dart';
 
 class CustomTextField extends StatelessWidget {
   final TextEditingController controller;

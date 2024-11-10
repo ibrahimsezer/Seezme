@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:seezme/chat_screen.dart';
-import 'package:seezme/login_page.dart';
-import 'package:seezme/models/message_model.dart';
-import 'package:seezme/profile.dart';
-import 'package:seezme/settings.dart';
-import 'package:seezme/utils/const.dart';
+import 'package:seezme/feature/chat_screen.dart';
+import 'package:seezme/core/providers/message_provider.dart';
+import 'package:seezme/feature/login/login_page.dart';
+import 'package:seezme/feature/profile/profile.dart';
+import 'package:seezme/feature/settings/settings.dart';
+import 'package:seezme/core/utility/constans/const.dart';
 
 void main() {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => MessageModel()),
+        ChangeNotifierProvider(create: (_) => MessageProvider()),
       ],
       child: const MyApp(),
     ),

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
-import 'package:seezme/models/message_model.dart';
+import 'package:seezme/core/models/message_model.dart';
+import 'package:seezme/core/providers/message_provider.dart';
 //import 'package:seezme/send_message.dart';
-import 'package:seezme/utils/const.dart';
+import 'package:seezme/core/utility/constans/const.dart';
 import 'package:seezme/widgets/media_message_widget.dart';
 //import 'package:cloud_firestore/cloud_firestore.dart';
 //import 'package:firebase_auth/firebase_auth.dart';
@@ -41,7 +42,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   void _sendMessage() {
     if (_controller.text.isNotEmpty) {
-      Provider.of<MessageModel>(context, listen: false)
+      Provider.of<MessageProvider>(context, listen: false)
           .addMessage(_controller.text);
       _controller.clear();
       _scrollToBottom();
@@ -50,7 +51,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   void _sendImage() {
     if (_image != null) {
-      Provider.of<MessageModel>(context, listen: false)
+      Provider.of<MessageProvider>(context, listen: false)
           .addMediaMessage(_image!);
       _scrollToBottom();
       Navigator.of(context).pop();
@@ -199,14 +200,14 @@ class _ChatScreenState extends State<ChatScreen> {
         body: Column(
           children: [
             Expanded(
-              child: Consumer<MessageModel>(
-                  builder: (context, messageModel, child) {
+              child: Consumer<MessageProvider>(
+                  builder: (context, MessageProvider, child) {
                 return ListView.builder(
                   controller: _scrollController,
                   reverse: false,
-                  itemCount: messageModel.messages.length,
+                  itemCount: MessageProvider.messages.length,
                   itemBuilder: (context, index) {
-                    final message = messageModel.messages[index];
+                    final message = MessageProvider.messages[index];
                     if (message is String) {
                       return MessageWidget(
                         message: message,

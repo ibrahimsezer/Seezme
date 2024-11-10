@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 
-class MessageModel with ChangeNotifier {
+class MessageProvider with ChangeNotifier {
   List<dynamic> _messages = [];
   List<dynamic> get messages => _messages;
 
