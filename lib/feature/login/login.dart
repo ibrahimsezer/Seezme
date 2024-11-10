@@ -45,7 +45,7 @@ class _LoginPageState extends State<LoginPage> {
       _showErrorSnackbar('Username and password cannot be empty.');
       return;
     }
-    Navigator.of(context).pushNamed('/chat_screen');
+    Navigator.of(context).pushNamed('/webrtc_connection');
   }
 
   @override
