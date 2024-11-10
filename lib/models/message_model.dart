@@ -16,4 +16,9 @@ class MessageModel with ChangeNotifier {
     _messages.add(media);
     notifyListeners();
   }
+
+  void removeMessage(int index) {
+    _messages.removeAt(index);
+    notifyListeners();
+  }
 }

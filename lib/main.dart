@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:seezme/chat_screen.dart';
+import 'package:seezme/login_page.dart';
 import 'package:seezme/models/message_model.dart';
 import 'package:seezme/profile.dart';
 import 'package:seezme/settings.dart';
@@ -25,10 +26,12 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'SeezMe',
       theme: defaultTheme,
-      home: const ChatScreen(),
+      home: const LoginPage(),
       routes: {
+        '/chat_screen': (context) => const ChatScreen(),
         '/settings': (context) => const SettingsScreen(),
         '/profile': (context) => const ProfileScreen(),
+        '/login': (context) => const LoginPage(),
       },
     );
   }

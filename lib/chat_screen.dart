@@ -208,9 +208,12 @@ class _ChatScreenState extends State<ChatScreen> {
                   itemBuilder: (context, index) {
                     final message = messageModel.messages[index];
                     if (message is String) {
-                      return MessageWidget(message: message);
+                      return MessageWidget(
+                        message: message,
+                        index: index,
+                      );
                     } else if (message is File) {
-                      return MediaMessageWidget(media: message);
+                      return MediaMessageWidget(media: message, index: index);
                     }
                     return null;
                   },
@@ -309,6 +312,9 @@ class _ChatScreenState extends State<ChatScreen> {
                                           child: const Text('Send'),
                                           onPressed: () {
                                             _sendImage();
+                                            setState(() {
+                                              _image = null;
+                                            });
                                           },
                                         ),
                                       ],

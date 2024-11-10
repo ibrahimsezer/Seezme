@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
 
 String defaultFontFamily = "Roboto";
-Color lightColor = const Color(0xFF2B272F);
+Color lightColor = const Color(0xFFFFFFFF);
 Color txtBgColor = const Color(0xFF282629);
+
+TextStyle errorTextStyle = TextStyle(
+  fontFamily: defaultFontFamily,
+  color: Colors.red,
+  fontSize: 12.0,
+  fontWeight: FontWeight.w200,
+);
 
 ThemeData defaultTheme = ThemeData(
   colorScheme: const ColorScheme(
