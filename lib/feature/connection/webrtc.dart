@@ -58,14 +58,12 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
     });
 
     _peerConnection!.onIceCandidate = (RTCIceCandidate candidate) {
-      if (candidate != null) {
-        _gatheredCandidates.add({
-          'candidate': candidate.candidate,
-          'sdpMid': candidate.sdpMid,
-          'sdpMLineIndex': candidate.sdpMLineIndex,
-        });
-        _addIceCandidateToFirestore(candidate);
-      }
+      _gatheredCandidates.add({
+        'candidate': candidate.candidate,
+        'sdpMid': candidate.sdpMid,
+        'sdpMLineIndex': candidate.sdpMLineIndex,
+      });
+      _addIceCandidateToFirestore(candidate);
     };
 
     _peerConnection!.onTrack = (RTCTrackEvent event) {
