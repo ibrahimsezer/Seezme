@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:seezme/feature/chat_screen.dart';
 import 'package:seezme/core/providers/message_provider.dart';
-import 'package:seezme/feature/connection/channel_list.dart';
-import 'package:seezme/feature/connection/webrtc_connection.dart';
+import 'package:seezme/feature/connection/webrtc.dart';
 import 'package:seezme/feature/login/login.dart';
 import 'package:seezme/feature/profile/profile.dart';
 import 'package:seezme/feature/register/register.dart';
@@ -32,14 +31,14 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'SeezMe',
       theme: defaultTheme,
-      home: ChannelListScreen(),
+      home: VideoCallScreen(),
       routes: {
         '/chat_screen': (context) => const ChatScreen(),
         '/settings': (context) => const SettingsScreen(),
         '/profile': (context) => const ProfileScreen(),
         '/login': (context) => const LoginPage(),
         '/register': (context) => const RegisterPage(),
-        '/webrtc_connection': (context) => WebRTCConnection(),
+        '/webrtc': (context) => VideoCallScreen(),
       },
     );
   }
