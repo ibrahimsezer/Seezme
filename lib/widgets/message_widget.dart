@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:seezme/core/providers/message_provider.dart';
+import 'package:seezme/core/providers/navigaton_provider.dart';
 import 'package:seezme/core/utility/constans/constants.dart';
+import 'package:seezme/widgets/avatar_widget.dart';
 
 class MessageWidget extends StatelessWidget {
   final String message;
@@ -55,14 +57,11 @@ class MessageWidget extends StatelessWidget {
               children: [
                 InkWell(
                   onTap: () {
-                    //Navigator.of(context).pushNamed('/profile');
-                    print("chat avatar clicked");
+                    //todo (not working this code here but working on sidepage avatar)
+                    //Provider.of<NavigationProvider>(context, listen: false)
+                    //.goTargetPage(context, Routes.profile);
                   },
-                  child: const CircleAvatar(
-                    backgroundImage: NetworkImage(
-                        'https://example.com/profile_image_url'), // Profil fotoğrafı URL'si
-                    radius: 20,
-                  ),
+                  child: AvatarWidget(),
                 ),
                 const SizedBox(width: 10),
                 const Text(

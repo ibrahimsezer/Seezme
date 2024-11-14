@@ -3,7 +3,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:seezme/core/providers/message_provider.dart';
 import 'package:seezme/core/providers/navigaton_provider.dart';
+import 'package:seezme/core/providers/theme_provider.dart';
 import 'package:seezme/core/utility/constans/constants.dart';
+import 'package:seezme/widgets/avatar_widget.dart';
 import 'package:seezme/widgets/media_message_widget.dart';
 import 'dart:io';
 import 'package:seezme/widgets/message_widget.dart';
@@ -107,7 +109,9 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: Titles.mainTitle,
-      theme: defaultTheme,
+      theme: defaultTheme, //todo rework theme
+      darkTheme: ThemeData.dark(),
+      themeMode: Provider.of<ThemeProvider>(context).currentTheme,
       home: Scaffold(
         appBar: AppBar(
           title: const Text(Titles.mainTitle,
@@ -156,33 +160,16 @@ class _ChatScreenState extends State<ChatScreen> {
                       ),
                     ),
                     Spacer(),
-                    Align(
-                      alignment: Alignment.centerRight,
+                    GestureDetector(
+                      onTap: () {
+                        Provider.of<NavigationProvider>(context, listen: false)
+                            .goTargetPage(context, Routes.profile);
+                      },
                       child: Padding(
-                        padding: const EdgeInsets.all(18.0),
-                        child: InkWell(
-                          onTap: () {
-                            Provider.of<NavigationProvider>(context,
-                                    listen: false)
-                                .goTargetPage(context, Routes.profile);
-                          },
-                          child: const CircleAvatar(
-                            backgroundImage: NetworkImage(Assets.profileImage),
-                            radius: 20,
-                          ),
-                        ),
-                      ),
+                          padding: EdgeInsets.all(30), child: AvatarWidget()),
                     ),
                   ],
                 ),
-              ),
-              ListTile(
-                leading: const Icon(Icons.settings),
-                title: const Text(Titles.settings),
-                onTap: () {
-                  Provider.of<NavigationProvider>(context, listen: false)
-                      .goTargetPage(context, Routes.settings);
-                },
               ),
               ListTile(
                 leading: const Icon(Icons.add),

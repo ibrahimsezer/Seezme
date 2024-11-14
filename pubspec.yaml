@@ -80,6 +80,8 @@ flutter:
     - lib\assets\addmedia.jpg
     - lib\assets\additem.jpg
     - lib\assets\logotransparent2.png
+    - lib\assets\default_user_profile_photo.jpeg
+    - lib\assets\appbar_bg.jpeg
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 

@@ -9,23 +9,28 @@ class Routes {
   static const String settings = '/settings';
   static const String webrtc = '/webrtc';
   static const String notifications = "/notifications";
+  static const String privacy = "/privacy";
+  static const String theme = "/theme_settings";
 }
 
 class Titles {
   static const String mainTitle = 'Seezme';
   static const String login = 'Login';
-  static const String quit = 'Quit';
+  static const String logout = 'Logout';
   static const String register = 'Register';
   static const String profile = 'Profile';
   static const String chatScreen = 'Chat Screen';
   static const String settings = 'Settings';
   static const String webrtc = 'WebRTC';
   static const String notifications = "Notifications";
+  static const String privacy = "Privacy";
+  static const String theme = "Theme";
 }
 
 class Assets {
-  static const String logoTransparent = 'lib\\assets\\logotransparent2.png';
-  static const String profileImage = 'https://example.com/profile_image_url';
+  static const String logoTransparent = 'lib/assets/logotransparent2.png';
+  static const String profileImage =
+      'lib/assets/default_user_profile_photo.jpeg';
 }
 
 String defaultFontFamily = "Roboto";

@@ -37,10 +37,20 @@ class TargetButtonWidget extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.max,
               children: [
-                Icon(icon),
+                Icon(
+                  icon,
+                  color: icon == Icons.exit_to_app_outlined
+                      ? Colors.red
+                      : Colors.white,
+                ),
                 Padding(
                   padding: const EdgeInsets.only(left: 8.0),
-                  child: Text(title),
+                  child: Text(title,
+                      style: TextStyle(
+                        color: icon == Icons.exit_to_app_outlined
+                            ? Colors.red
+                            : Colors.white,
+                      )),
                 ),
                 Spacer(),
                 Icon(Icons.arrow_forward_ios_outlined),
