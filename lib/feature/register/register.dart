@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:seezme/core/providers/navigaton_provider.dart';
+import 'package:seezme/core/utility/constans/constants.dart';
 import 'package:seezme/widgets/custom_text_widget.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -13,7 +16,6 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _passwordRetryController =
       TextEditingController();
-  String logoPath = 'lib\\assets\\logotransparent2.png';
 
   void _register() {
     // Kayıt işlemleri burada yapılacak
@@ -31,7 +33,8 @@ class _RegisterPageState extends State<RegisterPage> {
     }
 
     // Kayıt başarılı olduğunda yapılacak işlemler
-    Navigator.of(context).pushNamed('/chat_screen');
+    Provider.of<NavigationProvider>(context, listen: false)
+        .goTargetPage(context, Routes.login);
   }
 
   void _showErrorSnackbar(String message) {
@@ -55,7 +58,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 Image(
                   height: 200,
                   width: 200,
-                  image: AssetImage(logoPath),
+                  image: AssetImage(Assets.logoTransparent),
                   fit: BoxFit.contain,
                 ),
                 CustomTextField(
@@ -84,7 +87,8 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
                 GestureDetector(
                   onTap: () {
-                    Navigator.of(context).pushNamed('/login');
+                    Provider.of<NavigationProvider>(context, listen: false)
+                        .goTargetPage(context, Routes.login);
                   },
                   child: const Text(
                     'Do you have an account? Login here',

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:seezme/core/utility/constans/const.dart';
+import 'package:provider/provider.dart';
+import 'package:seezme/core/providers/navigaton_provider.dart';
+import 'package:seezme/core/utility/constans/constants.dart';
 import 'package:seezme/widgets/custom_text_widget.dart';
 
 class LoginPage extends StatefulWidget {
@@ -11,7 +13,6 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  String logoPath = 'lib\\assets\\logotransparent2.png';
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final GoogleSignIn _googleSignIn = GoogleSignIn();
@@ -19,7 +20,8 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> _handleGoogleSignIn() async {
     try {
       await _googleSignIn.signIn();
-      Navigator.of(context).pushNamed('/chat_screen');
+      Provider.of<NavigationProvider>(context, listen: false)
+          .goTargetPage(context, Routes.chatScreen);
     } catch (error) {
       _showErrorSnackbar('Google Sign-In failed. Please try again.');
       print(error);
@@ -45,7 +47,8 @@ class _LoginPageState extends State<LoginPage> {
       _showErrorSnackbar('Username and password cannot be empty.');
       return;
     }
-    Navigator.of(context).pushNamed('/webrtc_connection');
+    Provider.of<NavigationProvider>(context, listen: false)
+        .goTargetPage(context, Routes.chatScreen);
   }
 
   @override
@@ -61,7 +64,7 @@ class _LoginPageState extends State<LoginPage> {
                 Image(
                   height: 200,
                   width: 200,
-                  image: AssetImage(logoPath),
+                  image: AssetImage(Assets.logoTransparent),
                   fit: BoxFit.contain,
                 ),
                 CustomTextField(
@@ -89,7 +92,8 @@ class _LoginPageState extends State<LoginPage> {
                 const SizedBox(height: 16.0),
                 GestureDetector(
                   onTap: () {
-                    Navigator.of(context).pushNamed('/register');
+                    Provider.of<NavigationProvider>(context, listen: false)
+                        .goTargetPage(context, Routes.register);
                   },
                   child: const Text(
                     'Don\'t have an account? Register here',

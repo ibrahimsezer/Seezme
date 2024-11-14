@@ -1,9 +1,38 @@
 import 'package:flutter/material.dart';
 
+class Routes {
+  static const String login = '/login';
+  static const String quit = '/login';
+  static const String register = '/register';
+  static const String profile = '/profile';
+  static const String chatScreen = '/chat_screen';
+  static const String settings = '/settings';
+  static const String webrtc = '/webrtc';
+  static const String notifications = "/notifications";
+}
+
+class Titles {
+  static const String mainTitle = 'Seezme';
+  static const String login = 'Login';
+  static const String quit = 'Quit';
+  static const String register = 'Register';
+  static const String profile = 'Profile';
+  static const String chatScreen = 'Chat Screen';
+  static const String settings = 'Settings';
+  static const String webrtc = 'WebRTC';
+  static const String notifications = "Notifications";
+}
+
+class Assets {
+  static const String logoTransparent = 'lib\\assets\\logotransparent2.png';
+  static const String profileImage = 'https://example.com/profile_image_url';
+}
+
 String defaultFontFamily = "Roboto";
 Color lightColor = const Color(0xFFFFFFFF);
 Color txtBgColor = const Color(0xFF282629);
-
+Color buttonColorDark = const Color(0xFF282629);
+Color buttonBorderColorDark = const Color(0xFF2E2B30);
 TextStyle errorTextStyle = TextStyle(
   fontFamily: defaultFontFamily,
   color: Colors.red,

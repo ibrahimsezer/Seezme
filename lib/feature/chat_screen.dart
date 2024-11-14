@@ -2,13 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:seezme/core/providers/message_provider.dart';
-//import 'package:seezme/send_message.dart';
-import 'package:seezme/core/utility/constans/const.dart';
+import 'package:seezme/core/providers/navigaton_provider.dart';
+import 'package:seezme/core/utility/constans/constants.dart';
 import 'package:seezme/widgets/media_message_widget.dart';
-//import 'package:cloud_firestore/cloud_firestore.dart';
-//import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:io';
-
 import 'package:seezme/widgets/message_widget.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -24,7 +21,6 @@ class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
-  //final FirebaseAuth _auth = FirebaseAuth.instance;
   List<Widget> _drawerItems = [];
   File? _image;
   @override
@@ -63,7 +59,7 @@ class _ChatScreenState extends State<ChatScreen> {
         _scrollController.position.maxScrollExtent,
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeOut,
-      );
+      ); //todo check this
     }
   }
 
@@ -110,11 +106,12 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'SeezMe',
+      title: Titles.mainTitle,
       theme: defaultTheme,
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Seezme', style: TextStyle(color: Colors.white)),
+          title: const Text(Titles.mainTitle,
+              style: TextStyle(color: Colors.white)),
           backgroundColor: defaultTheme.primaryColor,
           actions: [
             Padding(
@@ -150,7 +147,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       child: const Padding(
                         padding: EdgeInsets.only(left: 18.0),
                         child: Text(
-                          'Seezme',
+                          Titles.mainTitle,
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 24,
@@ -165,12 +162,12 @@ class _ChatScreenState extends State<ChatScreen> {
                         padding: const EdgeInsets.all(18.0),
                         child: InkWell(
                           onTap: () {
-                            Navigator.of(context).pushNamed('/profile');
-                            print("right drawer avatar clicked");
+                            Provider.of<NavigationProvider>(context,
+                                    listen: false)
+                                .goTargetPage(context, Routes.profile);
                           },
                           child: const CircleAvatar(
-                            backgroundImage: NetworkImage(
-                                'https://example.com/profile_image_url'),
+                            backgroundImage: NetworkImage(Assets.profileImage),
                             radius: 20,
                           ),
                         ),
@@ -181,9 +178,10 @@ class _ChatScreenState extends State<ChatScreen> {
               ),
               ListTile(
                 leading: const Icon(Icons.settings),
-                title: const Text('Settings'),
+                title: const Text(Titles.settings),
                 onTap: () {
-                  Navigator.of(context).pushNamed('/settings');
+                  Provider.of<NavigationProvider>(context, listen: false)
+                      .goTargetPage(context, Routes.settings);
                 },
               ),
               ListTile(
@@ -338,8 +336,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         onPressed: () {
                           _sendMessage();
                           _controller.clear();
-                        } //todo _sendMessage,
-                        ),
+                        }),
                   ),
                 ],
               ),

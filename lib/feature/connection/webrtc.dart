@@ -31,8 +31,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
   }
 
   Future<void> startCall() async {
-    callDocId =
-        _firestore.collection('calls').doc().id; // Create a new call document
+    callDocId = _firestore.collection('calls').doc().id;
     await _initializePeerConnection();
     await _createOffer();
   }
@@ -45,25 +44,26 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
     };
     _peerConnection = await createPeerConnection(config);
 
-    // Kamera akışını başlatma ve yerel renderere bağlama
     _localStream = await navigator.mediaDevices.getUserMedia({
       'video': true,
       'audio': true,
     });
     _localRenderer.srcObject = _localStream;
 
-    // Kamera akışını RTCPeerConnection'a ekleme
     _localStream!.getTracks().forEach((track) {
       _peerConnection?.addTrack(track, _localStream!);
     });
 
-    _peerConnection!.onIceCandidate = (RTCIceCandidate candidate) {
-      _gatheredCandidates.add({
-        'candidate': candidate.candidate,
-        'sdpMid': candidate.sdpMid,
-        'sdpMLineIndex': candidate.sdpMLineIndex,
+    _peerConnection!.onIceCandidate = (RTCIceCandidate candidate) async {
+      await _firestore.collection('calls').doc(callDocId).update({
+        'callerCandidates': FieldValue.arrayUnion([
+          {
+            'candidate': candidate.candidate,
+            'sdpMid': candidate.sdpMid,
+            'sdpMLineIndex': candidate.sdpMLineIndex
+          }
+        ])
       });
-      _addIceCandidateToFirestore(candidate);
     };
 
     _peerConnection!.onTrack = (RTCTrackEvent event) {
@@ -78,52 +78,56 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
   Future<void> _createOffer() async {
     final offer = await _peerConnection!.createOffer();
     await _peerConnection!.setLocalDescription(offer);
-    _firestore.collection('calls').doc(callDocId).set({
+
+    await _firestore.collection('calls').doc(callDocId).set({
       'callerSDP': offer.sdp,
       'callerCandidates': _gatheredCandidates,
     });
   }
 
-  Future<void> _addIceCandidateToFirestore(RTCIceCandidate candidate) async {
-    await _firestore.collection('calls').doc(callDocId).update({
-      'callerCandidates': FieldValue.arrayUnion([
-        {
-          'candidate': candidate.candidate,
-          'sdpMid': candidate.sdpMid,
-          'sdpMLineIndex': candidate.sdpMLineIndex
-        }
-      ])
-    });
-  }
+  // Future<void> _addIceCandidateToFirestore(RTCIceCandidate candidate) async {
+  //   await _firestore.collection('calls').doc(callDocId).update({
+  //     'callerCandidates': FieldValue.arrayUnion([
+  //       {
+  //         'candidate': candidate.candidate,
+  //         'sdpMid': candidate.sdpMid,
+  //         'sdpMLineIndex': candidate.sdpMLineIndex
+  //       }
+  //     ])
+  //   });
+  // }
 
   Future<void> joinCall(String callDocId) async {
     final doc = await _firestore.collection('calls').doc(callDocId).get();
     if (doc.exists) {
       final offer = doc['callerSDP'];
       await _initializePeerConnection();
-      _createAnswer(offer);
+      await _setRemoteDescription(offer);
+      await _createAnswer();
 
-      // Caller ICE adaylarını ekleme
       List<dynamic> callerCandidates = doc['callerCandidates'];
-      callerCandidates.forEach((candidate) {
+      for (var candidate in callerCandidates) {
         _peerConnection!.addCandidate(RTCIceCandidate(
           candidate['candidate'],
           candidate['sdpMid'],
           candidate['sdpMLineIndex'],
         ));
-      });
+      }
     }
   }
 
-  void _createAnswer(String offer) {
-    _peerConnection!
+  Future<void> _setRemoteDescription(String offer) async {
+    await _peerConnection!
         .setRemoteDescription(RTCSessionDescription(offer, 'offer'));
-    _peerConnection!.createAnswer().then((answer) {
-      _peerConnection!.setLocalDescription(answer);
-      _firestore.collection('calls').doc(callDocId).update({
-        'calleeSDP': answer.sdp,
-        'calleeCandidates': _gatheredCandidates,
-      });
+  }
+
+  Future<void> _createAnswer() async {
+    final answer = await _peerConnection!.createAnswer();
+    await _peerConnection!.setLocalDescription(answer);
+
+    await _firestore.collection('calls').doc(callDocId).update({
+      'calleeSDP': answer.sdp,
+      'calleeCandidates': _gatheredCandidates,
     });
   }
 

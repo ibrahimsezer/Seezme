@@ -1,25 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:seezme/widgets/target_button_widget.dart';
+import 'package:seezme/core/utility/constans/constants.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({Key? key}) : super(key: key);
 
-  void _logout(BuildContext context) {
-    // Çıkış işlemleri burada yapılabilir
-    // Örneğin, kullanıcı oturumunu sonlandırabilirsiniz
-    Navigator.of(context)
-        .pushNamedAndRemoveUntil('/login', (Route<dynamic> route) => false);
-  }
-
   @override
   Widget build(BuildContext context) {
+    double sizeWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Settings'),
       ),
       body: Center(
-        child: ElevatedButton(
-          onPressed: () => _logout(context),
-          child: const Text('Quit'),
+        child: Column(
+          children: [
+            TargetButtonWidget(
+              sizeWidth: sizeWidth,
+              targetRoute: Routes.notifications,
+              icon: Icons.notifications,
+              title: Titles.notifications,
+            ),
+            TargetButtonWidget(
+              sizeWidth: sizeWidth,
+              targetRoute: Routes.quit,
+              icon: Icons.exit_to_app_outlined,
+              title: Titles.quit,
+            )
+          ],
         ),
       ),
     );
