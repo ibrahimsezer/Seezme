@@ -40,11 +40,22 @@ class Status {
   static const String statusBusy = 'Busy';
 }
 
+class LoginType {
+  static const String google = 'Login with Google';
+  static const String email = 'Login with Email';
+}
+
+class RegisterType {
+  static const String google = 'Register with Google';
+  static const String email = 'Register with Email';
+}
+
 String defaultFontFamily = "Roboto";
-Color lightColor = const Color(0xFFFFFFFF);
-Color txtBgColor = const Color(0xFF282629);
-Color buttonColorDark = const Color(0xFF282629);
-Color buttonBorderColorDark = const Color(0xFF2E2B30);
+Color defaultLightColor = const Color(0xFF596275);
+Color defaultTextBackgroundColor = const Color(0xFF596275);
+Color defaultButtonColorDark = const Color(0xFF596275);
+Color defaultButtonColorLight = const Color(0xFFFFFFFF);
+Color defaultButtonBorderColorDark = const Color(0xFF596275);
 TextStyle errorTextStyle = TextStyle(
   fontFamily: defaultFontFamily,
   color: Colors.red,
@@ -54,36 +65,32 @@ TextStyle errorTextStyle = TextStyle(
 
 ThemeData defaultTheme = ThemeData(
   colorScheme: const ColorScheme(
-    primary: Color(0xFFFFFFFF),
-    secondary: Color(0xFF252128),
-    surface: Color(0xFF252128),
-    error: Color(0xFF252128),
-    onPrimary: Color(0xFFFFFFFF),
-    onSecondary: Color(0xFF252128),
-    onSurface: Color(0xFFFFFFFF),
-    onError: Color(0xFF252128),
-    brightness: Brightness.dark,
+    primary: Color(0xFF303952), // Ana renk
+    secondary: Color(0xFF596275), // İkincil renk
+    surface: Color(0xFF303952), // Yüzey rengi
+    error: Color(0xFF252128), // Hata rengi
+    onPrimary: Color(0xFFFFFFFF), // Ana renk üzerindeki yazı rengi
+    onSecondary: Color(0xFFFFFFFF), // İkincil renk üzerindeki yazı rengi
+    onSurface: Color(0xFFFFFFFF), // Yüzey rengi üzerindeki yazı rengi
+    onError: Color(0xFFFFFFFF), // Hata rengi üzerindeki yazı rengi
+    brightness: Brightness.dark, // Tema parlaklığı
   ),
-  primaryColor: const Color(0xFF252128),
+  primaryColor: const Color(0xFF303952), // Ana renk
   textButtonTheme: TextButtonThemeData(
-      style: ButtonStyle(
-    backgroundColor: WidgetStateProperty.all<Color>(const Color(0xFF252128)),
-  )),
+    style: ButtonStyle(
+      backgroundColor: WidgetStateProperty.all<Color>(
+          const Color(0xFF596275)), // Buton arka plan rengi
+    ),
+  ),
   textTheme: TextTheme(
-    bodyLarge: TextStyle(fontFamily: defaultFontFamily),
-    bodyMedium: TextStyle(fontFamily: defaultFontFamily),
-    displayLarge: TextStyle(fontFamily: defaultFontFamily),
-    displayMedium: TextStyle(fontFamily: defaultFontFamily),
-    displaySmall: TextStyle(fontFamily: defaultFontFamily),
-    headlineMedium: TextStyle(fontFamily: defaultFontFamily),
-    headlineSmall: TextStyle(fontFamily: defaultFontFamily),
-    titleLarge: TextStyle(fontFamily: defaultFontFamily),
-    titleMedium: TextStyle(fontFamily: defaultFontFamily),
-    titleSmall: TextStyle(fontFamily: defaultFontFamily),
-    bodySmall: TextStyle(fontFamily: defaultFontFamily),
-    labelLarge: TextStyle(fontFamily: defaultFontFamily),
-    labelSmall: TextStyle(fontFamily: defaultFontFamily),
-    headlineLarge: TextStyle(fontFamily: defaultFontFamily),
-    labelMedium: TextStyle(fontFamily: defaultFontFamily),
+    bodyLarge: TextStyle(
+        fontFamily: defaultFontFamily,
+        color: Color(0xFFFFFFFF)), // Büyük metin rengi
+    bodyMedium: TextStyle(
+        fontFamily: defaultFontFamily,
+        color: Color(0xFFFFFFFF)), // Orta metin rengi
+    displayLarge: TextStyle(
+        fontFamily: defaultFontFamily,
+        color: Color(0xFFFFFFFF)), // Büyük başlık rengi
   ),
 );

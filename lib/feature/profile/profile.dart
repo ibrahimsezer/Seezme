@@ -1,9 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:seezme/core/utility/constans/constants.dart';
+import 'package:seezme/feature/login/login.dart';
 import 'package:seezme/widgets/target_button_widget.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({Key? key}) : super(key: key);
+
+  void _logout(BuildContext context) {
+    // Logout işlemleri burada yapılabilir
+    // Örneğin, kullanıcı oturumunu sonlandırma işlemleri
+
+    // Login sayfasına yönlendirme ve geri tuşu ile önceki sayfalara dönmeyi engelleme
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => const LoginPage()),
+      (Route<dynamic> route) => false,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {

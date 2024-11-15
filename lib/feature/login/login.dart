@@ -1,9 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
 import 'package:seezme/core/providers/navigaton_provider.dart';
+import 'package:seezme/core/services/shared_preferences_service.dart';
 import 'package:seezme/core/utility/constans/constants.dart';
-import 'package:seezme/widgets/custom_text_widget.dart';
+import 'package:seezme/widgets/authentication_button_widget.dart';
+import 'package:seezme/widgets/custom_textfield_widget.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -16,12 +19,59 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final GoogleSignIn _googleSignIn = GoogleSignIn();
+  final SharedPreferencesService _sharedPreferencesService =
+      SharedPreferencesService();
+
+  Future<void> _login() async {
+    final usernameOrEmail = _usernameController.text;
+    final password = _passwordController.text;
+
+    try {
+      // Query for username
+      final usernameQuerySnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .where('username', isEqualTo: usernameOrEmail)
+          .where('password', isEqualTo: password)
+          .get();
+
+      // Query for email
+      final emailQuerySnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: usernameOrEmail)
+          .where('password', isEqualTo: password)
+          .get();
+
+      if (usernameQuerySnapshot.docs.isNotEmpty ||
+          emailQuerySnapshot.docs.isNotEmpty) {
+        // Save login status
+        await _sharedPreferencesService.setLoggedIn(true);
+        // Navigate to chat screen
+        Navigator.pushReplacementNamed(context, Routes.chatScreen);
+      } else {
+        _showErrorSnackbar('Invalid username/email or password');
+      }
+    } catch (e) {
+      _showErrorSnackbar('Failed to login. Please try again.');
+      print(e);
+    }
+  }
 
   Future<void> _handleGoogleSignIn() async {
     try {
-      await _googleSignIn.signIn();
-      Provider.of<NavigationProvider>(context, listen: false)
-          .goTargetPage(context, Routes.chatScreen);
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      if (googleUser != null) {
+        final GoogleSignInAuthentication googleAuth =
+            await googleUser.authentication;
+        final String? idToken = googleAuth.idToken;
+
+        // Save login status
+        await _sharedPreferencesService.setLoggedIn(true);
+        // Navigate to chat screen
+        Provider.of<NavigationProvider>(context, listen: false)
+            .goTargetPage(context, Routes.chatScreen);
+      } else {
+        _showErrorSnackbar('Google Sign-In failed. Please try again.');
+      }
     } catch (error) {
       _showErrorSnackbar('Google Sign-In failed. Please try again.');
       print(error);
@@ -38,17 +88,6 @@ class _LoginPageState extends State<LoginPage> {
       duration: const Duration(seconds: 3),
     );
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  }
-
-  void _login() {
-    // Kullanıcı adı ve şifre ile giriş işlemleri burada yapılacak
-    // Örneğin, bir API çağrısı yapabilirsiniz
-    if (_usernameController.text.isEmpty || _passwordController.text.isEmpty) {
-      _showErrorSnackbar('Username and password cannot be empty.');
-      return;
-    }
-    Provider.of<NavigationProvider>(context, listen: false)
-        .goTargetPage(context, Routes.chatScreen);
   }
 
   @override
@@ -80,14 +119,14 @@ class _LoginPageState extends State<LoginPage> {
                   hintText: 'Password',
                 ),
                 const SizedBox(height: 16.0),
-                ElevatedButton(
-                  onPressed: _login,
-                  child: const Text('Login'),
+                AuthenticationButtonWidget(
+                  function: _login,
+                  authenticationType: LoginType.email,
                 ),
                 const SizedBox(height: 16.0),
-                ElevatedButton(
-                  onPressed: _handleGoogleSignIn,
-                  child: const Text('Login with Google'),
+                AuthenticationButtonWidget(
+                  function: _handleGoogleSignIn,
+                  authenticationType: LoginType.google,
                 ),
                 const SizedBox(height: 16.0),
                 GestureDetector(
@@ -99,7 +138,7 @@ class _LoginPageState extends State<LoginPage> {
                     'Don\'t have an account? Register here',
                     style: TextStyle(
                       color: Colors.blue,
-                      decoration: TextDecoration.underline,
+                      decoration: TextDecoration.none,
                     ),
                   ),
                 ),

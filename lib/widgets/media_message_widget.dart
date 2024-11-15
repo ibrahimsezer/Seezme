@@ -45,7 +45,7 @@ class MediaMessageWidget extends StatelessWidget {
       },
       child: Container(
         decoration: BoxDecoration(
-          color: txtBgColor,
+          color: defaultTextBackgroundColor,
           borderRadius: BorderRadius.circular(8.0),
         ),
         padding: const EdgeInsets.all(8.0),

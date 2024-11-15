@@ -5,6 +5,7 @@ import 'package:seezme/core/providers/navigaton_provider.dart';
 import 'package:seezme/core/providers/notifications_provider.dart';
 import 'package:seezme/core/providers/status_provider.dart';
 import 'package:seezme/core/providers/theme_provider.dart';
+import 'package:seezme/core/services/shared_preferences_service.dart';
 import 'package:seezme/feature/chat_screen.dart';
 import 'package:seezme/core/providers/message_provider.dart';
 import 'package:seezme/feature/connection/webrtc.dart';
@@ -19,6 +20,10 @@ import 'package:seezme/feature/settings/theme_settings.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  final sharedPreferencesService = SharedPreferencesService();
+  final isLoggedIn = await sharedPreferencesService.isLoggedIn();
+  print('Is Logged In: $isLoggedIn');
+
   runApp(
     MultiProvider(
       providers: [
@@ -30,13 +35,14 @@ void main() async {
         ChangeNotifierProvider(create: (_) => NotificationsProvider()),
         ChangeNotifierProvider(create: (_) => StatusProvider()),
       ],
-      child: const MyApp(),
+      child: MyApp(initialRoute: isLoggedIn ? Routes.chatScreen : Routes.login),
     ),
   );
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({super.key, required this.initialRoute});
+  final String initialRoute;
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +52,7 @@ class MyApp extends StatelessWidget {
         theme: defaultTheme, // todo rework theme
         darkTheme: ThemeData.dark(),
         themeMode: Provider.of<ThemeProvider>(context).currentTheme,
-        initialRoute: Routes.chatScreen,
+        initialRoute: initialRoute,
         routes: {
           Routes.register: (context) => const RegisterPage(),
           Routes.login: (context) => const LoginPage(),

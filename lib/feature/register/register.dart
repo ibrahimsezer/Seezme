@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:seezme/core/providers/navigaton_provider.dart';
 import 'package:seezme/core/utility/constans/constants.dart';
-import 'package:seezme/widgets/custom_text_widget.dart';
+import 'package:seezme/widgets/authentication_button_widget.dart';
+import 'package:seezme/widgets/custom_textfield_widget.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -81,10 +82,12 @@ class _RegisterPageState extends State<RegisterPage> {
                   hintText: 'Enter Retry Password',
                 ),
                 const SizedBox(height: 16.0),
-                ElevatedButton(
-                  onPressed: _register,
-                  child: const Text('Register'),
-                ),
+                AuthenticationButtonWidget(
+                    function: _register,
+                    authenticationType: RegisterType.email),
+                AuthenticationButtonWidget(
+                    function: _register,
+                    authenticationType: RegisterType.google),
                 GestureDetector(
                   onTap: () {
                     Provider.of<NavigationProvider>(context, listen: false)
@@ -94,7 +97,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     'Do you have an account? Login here',
                     style: TextStyle(
                       color: Colors.blue,
-                      decoration: TextDecoration.underline,
+                      decoration: TextDecoration.none,
                     ),
                   ),
                 ),

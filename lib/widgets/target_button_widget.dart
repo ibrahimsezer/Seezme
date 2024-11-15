@@ -21,17 +21,23 @@ class TargetButtonWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Provider.of<NavigationProvider>(context, listen: false)
-            .goTargetPage(context, targetRoute);
+        if (title == Titles.logout) {
+          Provider.of<NavigationProvider>(context, listen: false)
+              .logoutAndGoToLoginPage(context);
+        } else {
+          Provider.of<NavigationProvider>(context, listen: false)
+              .goTargetPage(context, targetRoute);
+        }
       },
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Container(
           width: sizeWidth * 0.9,
           decoration: BoxDecoration(
-              color: buttonColorDark,
+              color: defaultButtonColorDark,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(width: 1, color: buttonBorderColorDark)),
+              border:
+                  Border.all(width: 1, color: defaultButtonBorderColorDark)),
           child: Padding(
             padding: const EdgeInsets.all(18),
             child: Row(
