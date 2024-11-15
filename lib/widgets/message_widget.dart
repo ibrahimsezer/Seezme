@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:seezme/core/providers/message_provider.dart';
@@ -6,10 +7,15 @@ import 'package:seezme/widgets/avatar_widget.dart';
 
 class MessageWidget extends StatelessWidget {
   final String message;
+  final String sender;
+  final Timestamp createdAt;
   final int index;
+
   const MessageWidget({
     super.key,
     required this.message,
+    required this.sender,
+    required this.createdAt,
     required this.index,
   });
 
@@ -63,9 +69,9 @@ class MessageWidget extends StatelessWidget {
                   child: AvatarWidget(),
                 ),
                 const SizedBox(width: 10),
-                const Text(
-                  'Username', // Kullanıcı adı
-                  style: TextStyle(color: Colors.white70),
+                Text(
+                  sender, // Kullanıcı adı
+                  style: const TextStyle(color: Colors.white70),
                 ),
               ],
             ),
@@ -81,6 +87,13 @@ class MessageWidget extends StatelessWidget {
                       maxLines: null,
                       overflow: TextOverflow.visible,
                     ),
+                  ),
+                ),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: Text(
+                    createdAt.toDate().toString(),
+                    style: const TextStyle(color: Colors.white54, fontSize: 10),
                   ),
                 ),
               ],

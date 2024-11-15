@@ -1,3 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -5,6 +8,7 @@ import 'package:seezme/core/providers/message_provider.dart';
 import 'package:seezme/core/providers/navigaton_provider.dart';
 import 'package:seezme/core/providers/status_provider.dart';
 import 'package:seezme/core/providers/theme_provider.dart';
+import 'package:seezme/core/services/shared_preferences_service.dart';
 import 'package:seezme/core/utility/constans/constants.dart';
 import 'package:seezme/widgets/avatar_widget.dart';
 import 'package:seezme/widgets/media_message_widget.dart';
@@ -23,12 +27,21 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseStorage _storage = FirebaseStorage.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final SharedPreferencesService _sharedPreferencesService =
+      SharedPreferencesService();
 
   List<Widget> _drawerItems = [];
   File? _image;
+  String _username = "Username"; // Kullanıcı adını burada saklayın
+
   @override
   void initState() {
     super.initState();
+    _fetchChatMessages();
+    _fetchUsername();
   }
 
   @override
@@ -38,19 +51,77 @@ class _ChatScreenState extends State<ChatScreen> {
     super.dispose();
   }
 
-  void _sendMessage() {
-    if (_controller.text.isNotEmpty) {
-      Provider.of<MessageProvider>(context, listen: false)
-          .addMessage(_controller.text);
-      _controller.clear();
-      _scrollToBottom();
+  Future<void> _fetchUsername() async {
+    final username = await _sharedPreferencesService.getUsername();
+    if (username != null) {
+      setState(() {
+        _username = username;
+      });
     }
   }
 
-  void _sendImage() {
+  void _fetchChatMessages() {
+    //update fetchmessage
+    _firestore.collection('chat').snapshots().listen((querySnapshot) {
+      final messages = querySnapshot.docs.map((doc) => doc.data()).toList();
+
+      setState(() {
+        _drawerItems = messages.map((message) {
+          return ListTile(
+            leading: Icon(Icons.message),
+            title: Text(message['message']),
+            subtitle: Text(
+                '${message['sender']} - ${message['createdAt'].toDate().toString()}'),
+          );
+        }).toList();
+      });
+    });
+  }
+
+  Future<void> _sendMessage() async {
+    if (_controller.text.isNotEmpty) {
+      final message = _controller.text;
+      Provider.of<MessageProvider>(context, listen: false).addMessage({
+        'message': message,
+        'sender': _username,
+        'createdAt': Timestamp.now(),
+      });
+      _controller.clear();
+      _scrollToBottom();
+
+      // Firestore'a mesajı kaydet
+      await _firestore.collection('chat').add({
+        'message': message,
+        'sender': _username, // Gönderen kullanıcı adı
+        'createdAt': Timestamp.now(),
+      });
+    }
+  }
+
+  Future<void> _sendImage() async {
     if (_image != null) {
-      Provider.of<MessageProvider>(context, listen: false)
-          .addMediaMessage(_image!);
+      // Resmi Firebase Storage'a yükle
+      final storageRef = _storage
+          .ref()
+          .child('chat_images/${DateTime.now().millisecondsSinceEpoch}.jpg');
+      final uploadTask = storageRef.putFile(_image!);
+      final snapshot = await uploadTask.whenComplete(() => null);
+      final downloadUrl = await snapshot.ref.getDownloadURL();
+
+      // Firestore'a resmi kaydet
+      await _firestore.collection('chat').add({
+        'message': 'Image',
+        'imageUrl': downloadUrl,
+        'sender': _username, // Gönderen kullanıcı adı
+        'createdAt': Timestamp.now(),
+      });
+
+      Provider.of<MessageProvider>(context, listen: false).addMediaMessage({
+        'message': 'Image',
+        'imageUrl': downloadUrl,
+        'sender': _username,
+        'createdAt': Timestamp.now(),
+      });
       _scrollToBottom();
       Navigator.of(context).pop();
     }
@@ -179,7 +250,7 @@ class _ChatScreenState extends State<ChatScreen> {
                               children: [
                                 //todo update status
                                 Text(
-                                  "Username",
+                                  _username,
                                 ),
                                 Consumer<StatusProvider>(
                                     builder: (context, statusProvider, child) {
@@ -261,9 +332,11 @@ class _ChatScreenState extends State<ChatScreen> {
                   itemCount: MessageProvider.messages.length,
                   itemBuilder: (context, index) {
                     final message = MessageProvider.messages[index];
-                    if (message is String) {
+                    if (message is Map<String, dynamic>) {
                       return MessageWidget(
-                        message: message,
+                        message: message['message'],
+                        sender: message['sender'],
+                        createdAt: message['createdAt'],
                         index: index,
                       );
                     } else if (message is File) {

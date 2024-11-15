@@ -35,7 +35,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => NotificationsProvider()),
         ChangeNotifierProvider(create: (_) => StatusProvider()),
       ],
-      child: MyApp(initialRoute: isLoggedIn ? Routes.chatScreen : Routes.login),
+      child: MyApp(initialRoute: isLoggedIn ? Routes.login : Routes.register),
     ),
   );
 }

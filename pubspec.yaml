@@ -45,6 +45,7 @@ dependencies:
   flutter_webrtc: ^0.12.1+hotfix.1
   permission_handler: ^11.3.1
   shared_preferences: ^2.3.3
+  firebase_storage: ^12.3.6
 
 
 dev_dependencies:

@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class SharedPreferencesService {
   //todo rework SharedPreferencesService
   static const String _isLoggedInKey = 'isLoggedIn';
+  static const String _usernameKey = 'username';
 
   Future<bool> isLoggedIn() async {
     try {
@@ -21,5 +22,15 @@ class SharedPreferencesService {
     } catch (e) {
       print('Error setting shared preferences: $e');
     }
+  }
+
+  Future<String?> getUsername() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_usernameKey);
+  }
+
+  Future<void> setUsername(String username) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_usernameKey, username);
   }
 }

@@ -43,8 +43,16 @@ class _LoginPageState extends State<LoginPage> {
 
       if (usernameQuerySnapshot.docs.isNotEmpty ||
           emailQuerySnapshot.docs.isNotEmpty) {
-        // Save login status
+        // Kullanıcı adını al
+        final userDoc = usernameQuerySnapshot.docs.isNotEmpty
+            ? usernameQuerySnapshot.docs.first
+            : emailQuerySnapshot.docs.first;
+        final username = userDoc['username'];
+
+        // Save login status and username
         await _sharedPreferencesService.setLoggedIn(true);
+        await _sharedPreferencesService.setUsername(username);
+
         // Navigate to chat screen
         Navigator.pushReplacementNamed(context, Routes.chatScreen);
       } else {
@@ -124,10 +132,11 @@ class _LoginPageState extends State<LoginPage> {
                   authenticationType: LoginType.email,
                 ),
                 const SizedBox(height: 16.0),
-                AuthenticationButtonWidget(
-                  function: _handleGoogleSignIn,
-                  authenticationType: LoginType.google,
-                ),
+                //todo not working
+                // AuthenticationButtonWidget(
+                //   function: _handleGoogleSignIn,
+                //   authenticationType: LoginType.google,
+                // ),
                 const SizedBox(height: 16.0),
                 GestureDetector(
                   onTap: () {
