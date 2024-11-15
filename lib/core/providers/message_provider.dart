@@ -7,7 +7,7 @@ class MessageProvider with ChangeNotifier {
   List<dynamic> _messages = [];
   List<dynamic> get messages => _messages;
 
-  void _addMessage(String message) {
+  void _addMessage(Map<String, dynamic> message) {
     _messages.add(message);
     notifyListeners();
   }
