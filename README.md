@@ -31,12 +31,13 @@ Seezme is a feature-rich voice and chat messaging application developed in Flutt
 
 <table>
   <tr>
-   <td><img src="lib/assets/logo.jpg" alt="Logo" width="200"/></td><td><img src="lib/assets/profilepage.jpg" alt="Logo" width="200"/></td>
-   <td><img src="lib/assets/chat.jpg" alt="Chat" width="200"/></td>
+      <td><img src="lib/assets/logo.jpg" alt="Logo" width="200"/></td>
+      <td><img src="lib/assets/profilepage.jpg" alt="Logo" width="200"/></td>
+      <td><img src="lib/assets/chat.jpg" alt="Chat" width="200"/></td>
   </tr>
   <tr>
-   <td><img src="lib/assets/addmedia.jpg" alt="Add Media" width="200"/></td>
-   <td><img src="lib/assets/additem.jpg" alt="Add Item" width="200"/></td>
+      <td><img src="lib/assets/addmedia.jpg" alt="Add Media" width="200"/></td>
+      <td><img src="lib/assets/additem.jpg" alt="Add Item" width="200"/></td>
   </tr>
 </table>
 
@@ -106,3 +107,5 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 ### 📧 Mail : <ibrahimsezer.ceng@gmail.com>
 
 ### 🪪 Linkedin : <https://www.linkedin.com/in/ibrahim-sezer>
+
+### 🤵 Portfolio : <https://ibrahimsezer.github.io>

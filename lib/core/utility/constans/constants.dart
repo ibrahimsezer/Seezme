@@ -29,8 +29,15 @@ class Titles {
 
 class Assets {
   static const String logoTransparent = 'lib/assets/logotransparent2.png';
+  static const String logoSquare = 'lib/assets/logosquare.jpeg';
   static const String profileImage =
       'lib/assets/default_user_profile_photo.jpeg';
+}
+
+class Status {
+  static const String statusAvailable = 'Available';
+  static const String statusIdle = 'Idle';
+  static const String statusBusy = 'Busy';
 }
 
 String defaultFontFamily = "Roboto";

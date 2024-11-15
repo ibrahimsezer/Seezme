@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:seezme/core/providers/message_provider.dart';
-import 'package:seezme/core/providers/navigaton_provider.dart';
 import 'package:seezme/core/utility/constans/constants.dart';
 import 'package:seezme/widgets/avatar_widget.dart';
 

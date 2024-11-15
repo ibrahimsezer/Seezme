@@ -3,6 +3,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:seezme/core/providers/message_provider.dart';
 import 'package:seezme/core/providers/navigaton_provider.dart';
+import 'package:seezme/core/providers/status_provider.dart';
 import 'package:seezme/core/providers/theme_provider.dart';
 import 'package:seezme/core/utility/constans/constants.dart';
 import 'package:seezme/widgets/avatar_widget.dart';
@@ -107,6 +108,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    double sizeWidth = MediaQuery.of(context).size.width;
     return MaterialApp(
       title: Titles.mainTitle,
       theme: defaultTheme, //todo rework theme
@@ -138,35 +140,102 @@ class _ChatScreenState extends State<ChatScreen> {
             padding: EdgeInsets.zero,
             children: [
               Container(
-                height: 100,
+                height: sizeWidth * 0.4,
                 decoration: BoxDecoration(
                   color: defaultTheme.primaryColor,
                 ),
-                child: Row(
+                child: Column(
                   mainAxisSize: MainAxisSize.max,
-                  crossAxisAlignment: CrossAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Align(
-                      alignment: Alignment.centerLeft,
-                      child: const Padding(
-                        padding: EdgeInsets.only(left: 18.0),
-                        child: Text(
-                          Titles.mainTitle,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 24,
-                          ),
+                    Align(
+                      alignment: Alignment.center,
+                      child: Container(
+                        height: sizeWidth * 0.15,
+                        child: Image(
+                          image: AssetImage(Assets.logoTransparent),
                         ),
                       ),
                     ),
-                    Spacer(),
-                    GestureDetector(
-                      onTap: () {
-                        Provider.of<NavigationProvider>(context, listen: false)
-                            .goTargetPage(context, Routes.profile);
-                      },
-                      child: Padding(
-                          padding: EdgeInsets.all(30), child: AvatarWidget()),
+                    Row(
+                      mainAxisSize: MainAxisSize.max,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            Provider.of<NavigationProvider>(context,
+                                    listen: false)
+                                .goTargetPage(context, Routes.profile);
+                          },
+                          child: Padding(
+                              padding: EdgeInsets.all(15),
+                              child: AvatarWidget()),
+                        ),
+                        Row(
+                          children: [
+                            Column(
+                              children: [
+                                //todo update status
+                                Text(
+                                  "Username",
+                                ),
+                                Consumer<StatusProvider>(
+                                    builder: (context, statusProvider, child) {
+                                  return Text(
+                                    statusProvider.status,
+                                    style: TextStyle(
+                                        color: statusProvider.status ==
+                                                Status.statusAvailable
+                                            ? Colors.green
+                                            : statusProvider.status ==
+                                                    Status.statusIdle
+                                                ? Colors.orange
+                                                : statusProvider.status ==
+                                                        Status.statusBusy
+                                                    ? Colors.red
+                                                    : Colors.grey),
+                                  );
+                                }),
+                              ],
+                            ),
+                            PopupMenuButton<String>(
+                              icon: Icon(Icons.arrow_drop_down),
+                              onSelected: (String value) {
+                                Provider.of<StatusProvider>(context,
+                                        listen: false)
+                                    .updateStatus(value);
+                              },
+                              itemBuilder: (BuildContext context) {
+                                return [
+                                  PopupMenuItem<String>(
+                                    value: Status.statusAvailable,
+                                    child: Text(
+                                      Status.statusAvailable,
+                                      style: TextStyle(color: Colors.green),
+                                    ),
+                                  ),
+                                  PopupMenuItem<String>(
+                                    value: Status.statusIdle,
+                                    child: Text(
+                                      Status.statusIdle,
+                                      style: TextStyle(color: Colors.orange),
+                                    ),
+                                  ),
+                                  PopupMenuItem<String>(
+                                    value: Status.statusBusy,
+                                    child: Text(
+                                      Status.statusBusy,
+                                      style: TextStyle(color: Colors.red),
+                                    ),
+                                  ),
+                                ];
+                              },
+                            ),
+                          ],
+                        )
+                      ],
                     ),
                   ],
                 ),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:seezme/core/providers/navigaton_provider.dart';
 import 'package:seezme/core/providers/notifications_provider.dart';
+import 'package:seezme/core/providers/status_provider.dart';
 import 'package:seezme/core/providers/theme_provider.dart';
 import 'package:seezme/feature/chat_screen.dart';
 import 'package:seezme/core/providers/message_provider.dart';
@@ -27,6 +28,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => NavigationProvider()),
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => NotificationsProvider()),
+        ChangeNotifierProvider(create: (_) => StatusProvider()),
       ],
       child: const MyApp(),
     ),
@@ -38,22 +40,24 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: Titles.mainTitle,
-      theme: defaultTheme, // todo rework theme
-      darkTheme: ThemeData.dark(),
-      themeMode: Provider.of<ThemeProvider>(context).currentTheme,
-      initialRoute: Routes.chatScreen,
-      routes: {
-        Routes.register: (context) => const RegisterPage(),
-        Routes.login: (context) => const LoginPage(),
-        Routes.profile: (context) => const ProfileScreen(),
-        Routes.chatScreen: (context) => const ChatScreen(),
-        Routes.webrtc: (context) => VideoCallScreen(),
-        Routes.notifications: (context) => NotificationsPage(),
-        Routes.theme: (context) => ThemeSettingsPage(),
-        Routes.privacy: (context) => PrivacyPage(),
-      },
+    return SafeArea(
+      child: MaterialApp(
+        title: Titles.mainTitle,
+        theme: defaultTheme, // todo rework theme
+        darkTheme: ThemeData.dark(),
+        themeMode: Provider.of<ThemeProvider>(context).currentTheme,
+        initialRoute: Routes.chatScreen,
+        routes: {
+          Routes.register: (context) => const RegisterPage(),
+          Routes.login: (context) => const LoginPage(),
+          Routes.profile: (context) => const ProfileScreen(),
+          Routes.chatScreen: (context) => const ChatScreen(),
+          Routes.webrtc: (context) => VideoCallScreen(),
+          Routes.notifications: (context) => NotificationsPage(),
+          Routes.theme: (context) => ThemeSettingsPage(),
+          Routes.privacy: (context) => PrivacyPage(),
+        },
+      ),
     );
   }
 }
