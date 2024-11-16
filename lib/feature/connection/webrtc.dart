@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
@@ -38,6 +40,8 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
       _callIdController.text = callDocId;
       callDocId;
     });
+    log("\n\n\n\n");
+    log("Call started with ID: $callDocId");
   }
 
   Future<void> _initializePeerConnection() async {
@@ -59,6 +63,13 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
     });
 
     _peerConnection!.onIceCandidate = (RTCIceCandidate candidate) async {
+      log("\n\n\n\n");
+      log("New ICE candidate: ${candidate.candidate}");
+      _gatheredCandidates.add({
+        'candidate': candidate.candidate,
+        'sdpMid': candidate.sdpMid,
+        'sdpMLineIndex': candidate.sdpMLineIndex
+      });
       await _firestore.collection('calls').doc(callDocId).update({
         'callerCandidates': FieldValue.arrayUnion([
           {
@@ -87,19 +98,10 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
       'callerSDP': offer.sdp,
       'callerCandidates': _gatheredCandidates,
     });
-  }
+    log("\n\n\n\n");
 
-  // Future<void> _addIceCandidateToFirestore(RTCIceCandidate candidate) async {
-  //   await _firestore.collection('calls').doc(callDocId).update({
-  //     'callerCandidates': FieldValue.arrayUnion([
-  //       {
-  //         'candidate': candidate.candidate,
-  //         'sdpMid': candidate.sdpMid,
-  //         'sdpMLineIndex': candidate.sdpMLineIndex
-  //       }
-  //     ])
-  //   });
-  // }
+    log("Offer created with SDP: ${offer.sdp}");
+  }
 
   Future<void> joinCall(String callDocId) async {
     final doc = await _firestore.collection('calls').doc(callDocId).get();
@@ -116,13 +118,38 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
           candidate['sdpMid'],
           candidate['sdpMLineIndex'],
         ));
+        log("\n\n\n\n");
+
+        log("Added ICE candidate: ${candidate['candidate']}");
       }
+      // Fetch the updated document to get the calleeCandidates
+      final updatedDoc =
+          await _firestore.collection('calls').doc(callDocId).get();
+
+      List<dynamic> calleeCandidates = updatedDoc['calleeCandidates'];
+      for (var candidate in calleeCandidates) {
+        _peerConnection!.addCandidate(RTCIceCandidate(
+          candidate['candidate'],
+          candidate['sdpMid'],
+          candidate['sdpMLineIndex'],
+        ));
+        log("\n\n\n\n");
+
+        log("Added ICE candidate: ${candidate['candidate']}");
+      }
+    } else {
+      log("\n\n\n\n");
+
+      log("Call document does not exist");
     }
   }
 
   Future<void> _setRemoteDescription(String offer) async {
     await _peerConnection!
         .setRemoteDescription(RTCSessionDescription(offer, 'offer'));
+    log("\n\n\n\n");
+
+    log("Remote description set with offer: $offer");
   }
 
   Future<void> _createAnswer() async {
@@ -133,6 +160,9 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
       'calleeSDP': answer.sdp,
       'calleeCandidates': _gatheredCandidates,
     });
+    log("\n\n\n\n");
+
+    log("Answer created with SDP: ${answer.sdp}");
   }
 
   @override
