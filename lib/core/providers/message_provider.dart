@@ -4,8 +4,12 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 
 class MessageProvider with ChangeNotifier {
-  List<dynamic> _messages = [];
-  List<dynamic> get messages => _messages;
+  List<Map<String, dynamic>> _messages = [];
+  List<Map<String, dynamic>> get messages => _messages;
+  set messages(List<Map<String, dynamic>> messages) {
+    _messages = messages;
+    notifyListeners();
+  }
 
   void _addMessage(Map<String, dynamic> message) {
     _messages.add(message);
@@ -15,7 +19,7 @@ class MessageProvider with ChangeNotifier {
   get addMessage => _addMessage;
 
   void _addMediaMessage(File media) {
-    _messages.add(media);
+    _messages.add({'media': media});
     notifyListeners();
   }
 
@@ -26,4 +30,11 @@ class MessageProvider with ChangeNotifier {
   }
 
   get removeMessage => _removeMessage;
+
+  void _clearMessages() {
+    _messages.clear();
+    notifyListeners();
+  }
+
+  get clearMessages => _clearMessages;
 }

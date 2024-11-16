@@ -65,16 +65,7 @@ class _ChatScreenState extends State<ChatScreen> {
     _firestore.collection('chat').snapshots().listen((querySnapshot) {
       final messages = querySnapshot.docs.map((doc) => doc.data()).toList();
 
-      setState(() {
-        _drawerItems = messages.map((message) {
-          return ListTile(
-            leading: Icon(Icons.message),
-            title: Text(message['message']),
-            subtitle: Text(
-                '${message['sender']} - ${message['createdAt'].toDate().toString()}'),
-          );
-        }).toList();
-      });
+      Provider.of<MessageProvider>(context, listen: false).messages = messages;
     });
   }
 
@@ -88,7 +79,6 @@ class _ChatScreenState extends State<ChatScreen> {
       });
       _controller.clear();
       _scrollToBottom();
-
       // Firestore'a mesajı kaydet
       await _firestore.collection('chat').add({
         'message': message,
@@ -96,6 +86,7 @@ class _ChatScreenState extends State<ChatScreen> {
         'createdAt': Timestamp.now(),
       });
     }
+    _fetchChatMessages();
   }
 
   Future<void> _sendImage() async {
@@ -199,6 +190,8 @@ class _ChatScreenState extends State<ChatScreen> {
                   icon: const Icon(Icons.menu),
                   color: Colors.white,
                   onPressed: () {
+                    Provider.of<MessageProvider>(context, listen: false)
+                        .clearMessages();
                     Scaffold.of(context).openEndDrawer();
                   },
                 ),
@@ -340,7 +333,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         index: index,
                       );
                     } else if (message is File) {
-                      return MediaMessageWidget(media: message, index: index);
+                      return null; //MediaMessageWidget(media: message, index: index);
                     }
                     return null;
                   },
