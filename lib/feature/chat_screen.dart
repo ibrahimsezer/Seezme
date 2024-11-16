@@ -61,9 +61,18 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void _fetchChatMessages() {
-    //update fetchmessage
     _firestore.collection('chat').snapshots().listen((querySnapshot) {
-      final messages = querySnapshot.docs.map((doc) => doc.data()).toList();
+      final messages = querySnapshot.docs.map((doc) {
+        final data = doc.data();
+        data['id'] = doc.id; // Belge ID'sini ekle
+        return data;
+      }).toList();
+
+      messages.sort((a, b) {
+        Timestamp aTimestamp = a['createdAt'];
+        Timestamp bTimestamp = b['createdAt'];
+        return aTimestamp.compareTo(bTimestamp);
+      });
 
       Provider.of<MessageProvider>(context, listen: false).messages = messages;
     });
@@ -190,8 +199,6 @@ class _ChatScreenState extends State<ChatScreen> {
                   icon: const Icon(Icons.menu),
                   color: Colors.white,
                   onPressed: () {
-                    Provider.of<MessageProvider>(context, listen: false)
-                        .clearMessages();
                     Scaffold.of(context).openEndDrawer();
                   },
                 ),

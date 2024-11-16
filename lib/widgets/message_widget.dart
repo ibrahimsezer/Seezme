@@ -10,8 +10,9 @@ class MessageWidget extends StatelessWidget {
   final String sender;
   final Timestamp createdAt;
   final int index;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  const MessageWidget({
+  MessageWidget({
     super.key,
     required this.message,
     required this.sender,
@@ -38,9 +39,14 @@ class MessageWidget extends StatelessWidget {
                 ),
                 TextButton(
                   child: const Text('Delete'),
-                  onPressed: () {
-                    Provider.of<MessageProvider>(context, listen: false)
-                        .removeMessage(index);
+                  onPressed: () async {
+                    // Firestore'dan mesajı sil
+                    final messageProvider =
+                        Provider.of<MessageProvider>(context, listen: false);
+                    final message = messageProvider.messages[index];
+                    final messageId =
+                        message['id']; // Mesajın Firestore'daki ID'si
+                    await _firestore.collection('chat').doc(messageId).delete();
                     Navigator.of(context).pop();
                   },
                 ),
@@ -92,7 +98,7 @@ class MessageWidget extends StatelessWidget {
                 Align(
                   alignment: Alignment.centerRight,
                   child: Text(
-                    createdAt.toDate().toString(),
+                    createdAt.toDate().toString().substring(0, 19),
                     style: const TextStyle(color: Colors.white54, fontSize: 10),
                   ),
                 ),

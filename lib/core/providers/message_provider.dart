@@ -24,6 +24,7 @@ class MessageProvider with ChangeNotifier {
   }
 
   get addMediaMessage => _addMediaMessage;
+
   void _removeMessage(int index) {
     _messages.removeAt(index);
     notifyListeners();
