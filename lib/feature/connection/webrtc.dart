@@ -34,6 +34,10 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
     callDocId = _firestore.collection('calls').doc().id;
     await _initializePeerConnection();
     await _createOffer();
+    setState(() {
+      _callIdController.text = callDocId;
+      callDocId;
+    });
   }
 
   Future<void> _initializePeerConnection() async {
@@ -143,7 +147,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('WebRTC Video Call')),
+      appBar: AppBar(title: Text('Video Call')),
       body: Column(
         children: [
           TextButton(

@@ -316,6 +316,13 @@ class _ChatScreenState extends State<ChatScreen> {
                 title: const Text('Add Item'),
                 onTap: _showAddItemDialog,
               ),
+              ListTile(
+                leading: const Icon(Icons.video_call),
+                title: const Text("Video Call"),
+                onTap: () =>
+                    Provider.of<NavigationProvider>(context, listen: false)
+                        .goTargetPage(context, Routes.webrtc),
+              ),
               ..._drawerItems,
             ],
           ),
