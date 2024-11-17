@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -23,7 +25,7 @@ class ChatScreen extends StatefulWidget {
   State<ChatScreen> createState() => _ChatScreenState();
 }
 
-class _ChatScreenState extends State<ChatScreen> {
+class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -37,15 +39,42 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _fetchChatMessages();
+    _controller.addListener(_handleKeyPress);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToBottom();
+    });
+
     //_fetchUsername();
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _controller.removeListener(_handleKeyPress);
     _controller.dispose();
     _scrollController.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _fetchChatMessages();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _scrollToBottom();
+        log("scrollBottom Changed!!\n\n");
+      });
+    }
+  }
+
+  void _handleKeyPress() {
+    if (_controller.text.isNotEmpty && _controller.text.endsWith('\n')) {
+      _controller.text =
+          _controller.text.trim(); // Remove the newline character
+      _sendMessage();
+    }
   }
 
   Future<void> _fetchUsername() async {
@@ -56,7 +85,7 @@ class _ChatScreenState extends State<ChatScreen> {
     _firestore.collection('chat').snapshots().listen((querySnapshot) {
       final messages = querySnapshot.docs.map((doc) {
         final data = doc.data();
-        data['id'] = doc.id; // Belge ID'sini ekle
+        data['id'] = doc.id;
         return data;
       }).toList();
 
@@ -67,6 +96,9 @@ class _ChatScreenState extends State<ChatScreen> {
       });
 
       Provider.of<MessageProvider>(context, listen: false).messages = messages;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _scrollToBottom();
+      });
     });
   }
 
@@ -118,7 +150,7 @@ class _ChatScreenState extends State<ChatScreen> {
   void _scrollToBottom() {
     if (_scrollController.hasClients) {
       _scrollController.animateTo(
-        _scrollController.position.maxScrollExtent,
+        _scrollController.position.maxScrollExtent + 200,
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeOut,
       ); //todo check this
@@ -139,6 +171,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   void _showAddItemDialog() {
     showDialog(
+      useRootNavigator: true,
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
@@ -435,6 +468,9 @@ class _ChatScreenState extends State<ChatScreen> {
                           },
                         ),
                       ),
+                      onSubmitted: (value) {
+                        _sendMessage();
+                      },
                     ),
                   ),
                   const SizedBox(width: 8),

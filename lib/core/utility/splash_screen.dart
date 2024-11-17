@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:seezme/core/providers/navigaton_provider.dart';
 import 'package:seezme/core/services/shared_preferences_service.dart';
 import 'package:seezme/core/utility/constans/constants.dart';
+import 'package:seezme/feature/chat_screen.dart';
+import 'package:seezme/feature/login/login.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -19,13 +21,16 @@ class _SplashScreenState extends State<SplashScreen> {
   _navigateToNextPage() async {
     final sharedPreferencesService = SharedPreferencesService();
     final isLoggedIn = await sharedPreferencesService.isLoggedIn();
-    await Future.delayed(Duration(seconds: 2));
+
+    await Future.delayed(Duration(seconds: 1));
     if (isLoggedIn) {
-      Provider.of<NavigationProvider>(context, listen: false)
-          .goTargetPage(context, Routes.chatScreen);
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const ChatScreen()),
+      );
     } else {
-      Provider.of<NavigationProvider>(context, listen: false)
-          .goTargetPage(context, Routes.login);
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const LoginPage()),
+      );
     }
   }
 
