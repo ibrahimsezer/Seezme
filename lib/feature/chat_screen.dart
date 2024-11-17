@@ -52,12 +52,15 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Future<void> _fetchUsername() async {
-    final username = await _sharedPreferencesService.getUsername();
-    if (username != null) {
-      setState(() {
-        _username = username;
+    _firestore.collection("users").snapshots().listen((querySnapshot) {
+      querySnapshot.docs.forEach((element) {
+        if (element.id == _auth.currentUser!.uid) {
+          setState(() {
+            _username = element['username'];
+          });
+        }
       });
-    }
+    });
   }
 
   void _fetchChatMessages() {

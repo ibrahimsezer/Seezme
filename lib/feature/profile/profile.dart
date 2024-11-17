@@ -1,21 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:seezme/core/services/shared_preferences_service.dart';
 import 'package:seezme/core/utility/constans/constants.dart';
-import 'package:seezme/feature/login/login.dart';
 import 'package:seezme/widgets/target_button_widget.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
 
-  void _logout(BuildContext context) {
-    // Logout işlemleri burada yapılabilir
-    // Örneğin, kullanıcı oturumunu sonlandırma işlemleri
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
 
-    // Login sayfasına yönlendirme ve geri tuşu ile önceki sayfalara dönmeyi engelleme
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (context) => const LoginPage()),
-      (Route<dynamic> route) => false,
-    );
+class _ProfileScreenState extends State<ProfileScreen> {
+  late Future<String?> getUser;
+  late Future<String?> getEmail;
+
+  @override
+  void initState() {
+    super.initState();
+    getUser = SharedPreferencesService().getUsername();
+    getEmail = SharedPreferencesService().getEmail();
   }
 
   @override
@@ -35,20 +38,42 @@ class ProfileScreen extends StatelessWidget {
                 backgroundImage: AssetImage(Assets.profileImage),
               ),
               SizedBox(height: 16),
-              Text(
-                'Username',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
+              FutureBuilder<String?>(
+                future: getUser,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  } else if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}');
+                  } else {
+                    return Text(
+                      snapshot.data ?? '--',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    );
+                  }
+                },
               ),
               SizedBox(height: 8),
-              Text(
-                'email@example.com',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey,
-                ),
+              FutureBuilder<String?>(
+                future: getEmail,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  } else if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}');
+                  } else {
+                    return Text(
+                      snapshot.data ?? '--',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey,
+                      ),
+                    );
+                  }
+                },
               ),
               SizedBox(height: 16),
               TargetButtonWidget(

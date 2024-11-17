@@ -48,10 +48,12 @@ class _LoginPageState extends State<LoginPage> {
             ? usernameQuerySnapshot.docs.first
             : emailQuerySnapshot.docs.first;
         final username = userDoc['username'];
+        final email = userDoc['email'];
 
         // Save login status and username
         await _sharedPreferencesService.setLoggedIn(true);
         await _sharedPreferencesService.setUsername(username);
+        await _sharedPreferencesService.setEmail(email);
 
         // Navigate to chat screen
         Navigator.pushReplacementNamed(context, Routes.chatScreen);

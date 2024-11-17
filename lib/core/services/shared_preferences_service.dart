@@ -4,6 +4,7 @@ class SharedPreferencesService {
   //todo rework SharedPreferencesService
   static const String _isLoggedInKey = 'isLoggedIn';
   static const String _usernameKey = 'username';
+  static const String _emailKey = 'email';
 
   Future<bool> isLoggedIn() async {
     try {
@@ -34,8 +35,18 @@ class SharedPreferencesService {
     return prefs.getString(_usernameKey);
   }
 
+  Future<String?> getEmail() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_emailKey);
+  }
+
   Future<void> setUsername(String username) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_usernameKey, username);
+  }
+
+  Future<void> setEmail(String email) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_emailKey, email);
   }
 }
