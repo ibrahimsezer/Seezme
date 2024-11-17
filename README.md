@@ -46,8 +46,8 @@ Seezme is a feature-rich voice and chat messaging application developed in Flutt
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/ibrahimsezer/Seezme.git
-   cd Seezme
+   git clone https://github.com/ibrahimsezer/seezme.git
+   cd seezme
    ```
 
 2. Install dependencies:
