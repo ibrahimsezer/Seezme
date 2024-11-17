@@ -11,6 +11,7 @@ class Routes {
   static const String notifications = "/notifications";
   static const String privacy = "/privacy";
   static const String theme = "/theme_settings";
+  static const String splashScreen = "/splash_screen";
 }
 
 class Titles {
@@ -32,6 +33,7 @@ class Assets {
   static const String logoSquare = 'lib/assets/logosquare.jpeg';
   static const String profileImage =
       'lib/assets/default_user_profile_photo.jpeg';
+  static const String logo_9_16 = "lib/assets/logo.jpg";
 }
 
 class Status {
@@ -51,11 +53,11 @@ class RegisterType {
 }
 
 String defaultFontFamily = "Roboto";
-Color defaultLightColor = const Color(0xFF596275);
-Color defaultTextBackgroundColor = const Color(0xFF596275);
-Color defaultButtonColorDark = const Color(0xFF596275);
+Color defaultLightColor = const Color(0xFF485460);
+Color defaultTextBackgroundColor = const Color(0xFF485460);
+Color defaultButtonColorDark = const Color(0xFF485460);
 Color defaultButtonColorLight = const Color(0xFFFFFFFF);
-Color defaultButtonBorderColorDark = const Color(0xFF596275);
+Color defaultButtonBorderColorDark = const Color(0xFF485460);
 TextStyle errorTextStyle = TextStyle(
   fontFamily: defaultFontFamily,
   color: Colors.red,
@@ -65,9 +67,9 @@ TextStyle errorTextStyle = TextStyle(
 
 ThemeData defaultTheme = ThemeData(
   colorScheme: const ColorScheme(
-    primary: Color(0xFF303952), // Ana renk
-    secondary: Color(0xFF596275), // İkincil renk
-    surface: Color(0xFF303952), // Yüzey rengi
+    primary: Color(0xFF1e272e), // Ana renk
+    secondary: Color(0xFF485460), // İkincil renk
+    surface: Color(0xFF1e272e), // Yüzey rengi
     error: Color(0xFF252128), // Hata rengi
     onPrimary: Color(0xFFFFFFFF), // Ana renk üzerindeki yazı rengi
     onSecondary: Color(0xFFFFFFFF), // İkincil renk üzerindeki yazı rengi
@@ -75,11 +77,11 @@ ThemeData defaultTheme = ThemeData(
     onError: Color(0xFFFFFFFF), // Hata rengi üzerindeki yazı rengi
     brightness: Brightness.dark, // Tema parlaklığı
   ),
-  primaryColor: const Color(0xFF303952), // Ana renk
+  primaryColor: const Color(0xFF1e272e), // Ana renk
   textButtonTheme: TextButtonThemeData(
     style: ButtonStyle(
       backgroundColor: WidgetStateProperty.all<Color>(
-          const Color(0xFF596275)), // Buton arka plan rengi
+          const Color(0xFF485460)), // Buton arka plan rengi
     ),
   ),
   textTheme: TextTheme(

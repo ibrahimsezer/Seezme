@@ -146,9 +146,10 @@ class _RegisterPageState extends State<RegisterPage> {
                 AuthenticationButtonWidget(
                     function: _registerWithEmail,
                     authenticationType: RegisterType.email),
-                AuthenticationButtonWidget(
-                    function: _registerWithGoogle,
-                    authenticationType: RegisterType.google),
+                // AuthenticationButtonWidget(//todo: google sign in
+                //     function: _registerWithGoogle,
+                //     authenticationType: RegisterType.google),
+                SizedBox(height: 16),
                 GestureDetector(
                   onTap: () {
                     Provider.of<NavigationProvider>(context, listen: false)

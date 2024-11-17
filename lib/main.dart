@@ -5,7 +5,7 @@ import 'package:seezme/core/providers/navigaton_provider.dart';
 import 'package:seezme/core/providers/notifications_provider.dart';
 import 'package:seezme/core/providers/status_provider.dart';
 import 'package:seezme/core/providers/theme_provider.dart';
-import 'package:seezme/core/services/shared_preferences_service.dart';
+import 'package:seezme/core/utility/splash_screen.dart';
 import 'package:seezme/feature/chat_screen.dart';
 import 'package:seezme/core/providers/message_provider.dart';
 import 'package:seezme/feature/connection/webrtc.dart';
@@ -20,9 +20,6 @@ import 'package:seezme/feature/settings/theme_settings.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  final sharedPreferencesService = SharedPreferencesService();
-  final isLoggedIn = await sharedPreferencesService.isLoggedIn();
-  print('Is Logged In: $isLoggedIn');
 
   runApp(
     MultiProvider(
@@ -35,7 +32,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => NotificationsProvider()),
         ChangeNotifierProvider(create: (_) => StatusProvider()),
       ],
-      child: MyApp(initialRoute: isLoggedIn ? Routes.login : Routes.register),
+      child: MyApp(initialRoute: Routes.splashScreen),
     ),
   );
 }
@@ -62,6 +59,7 @@ class MyApp extends StatelessWidget {
           Routes.notifications: (context) => NotificationsPage(),
           Routes.theme: (context) => ThemeSettingsPage(),
           Routes.privacy: (context) => PrivacyPage(),
+          Routes.splashScreen: (context) => SplashScreen(),
         },
       ),
     );
