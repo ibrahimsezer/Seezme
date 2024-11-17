@@ -43,7 +43,6 @@ class _LoginPageState extends State<LoginPage> {
 
       if (usernameQuerySnapshot.docs.isNotEmpty ||
           emailQuerySnapshot.docs.isNotEmpty) {
-        // Kullanıcı adını al
         final userDoc = usernameQuerySnapshot.docs.isNotEmpty
             ? usernameQuerySnapshot.docs.first
             : emailQuerySnapshot.docs.first;

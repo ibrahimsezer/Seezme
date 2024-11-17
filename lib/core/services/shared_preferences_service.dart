@@ -32,8 +32,14 @@ class SharedPreferencesService {
   }
 
   Future<void> clearUserData() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.clear();
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_isLoggedInKey);
+      await prefs.remove(_usernameKey);
+      await prefs.remove(_emailKey);
+    } catch (e) {
+      print('Error clearing shared preferences: $e');
+    }
   }
 
   Future<String?> getUsername() async {

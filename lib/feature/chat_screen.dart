@@ -81,6 +81,21 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
     _username;
   }
 
+  Future<String> _fetchCurrentUserDetails() async {
+    final currentUser = _auth.currentUser;
+    if (currentUser != null) {
+      final userDoc =
+          await _firestore.collection('users').doc(currentUser.uid).get();
+      if (userDoc.exists) {
+        final userData = userDoc.data();
+        final userId = userDoc.id;
+        final username = userData?['username'];
+        return userId;
+      }
+    }
+    return "unknown";
+  }
+
   void _fetchChatMessages() {
     _firestore.collection('chat').snapshots().listen((querySnapshot) {
       final messages = querySnapshot.docs.map((doc) {
@@ -320,7 +335,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                               onSelected: (String value) {
                                 Provider.of<StatusProvider>(context,
                                         listen: false)
-                                    .updateStatus(value);
+                                    .updateStatus(value, "");
                               },
                               itemBuilder: (BuildContext context) {
                                 return [
@@ -385,6 +400,58 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                   //Provider.of<NavigationProvider>(context, listen: false)
                   //  .goTargetPage(context, Routes.webrtc),
                   ),
+              ListTile(
+                leading: const Icon(Icons.people),
+                title: const Text('Active Users'),
+                onTap: () async {
+                  final usersSnapshot =
+                      await _firestore.collection('users').get();
+                  final users =
+                      usersSnapshot.docs.map((doc) => doc.data()).toList();
+
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: const Text('Active Users'),
+                        content: SizedBox(
+                          width: double.maxFinite,
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: users.length,
+                            itemBuilder: (context, index) {
+                              final user = users[index];
+                              return ListTile(
+                                title: Text(user['username'] ?? 'Unknown'),
+                                subtitle: Text(user['status'] ?? 'Unknown'),
+                                leading: Icon(
+                                  Icons.circle,
+                                  color: user['status'] ==
+                                          Status.statusAvailable
+                                      ? Colors.green
+                                      : user['status'] == Status.statusIdle
+                                          ? Colors.orange
+                                          : user['status'] == Status.statusBusy
+                                              ? Colors.red
+                                              : Colors.grey,
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                        actions: <Widget>[
+                          TextButton(
+                            child: const Text('Close'),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                },
+              ),
               ..._drawerItems,
             ],
           ),
