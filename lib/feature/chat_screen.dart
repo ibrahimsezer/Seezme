@@ -330,7 +330,25 @@ class _ChatScreenState extends State<ChatScreen> {
               ListTile(
                   leading: const Icon(Icons.video_call),
                   title: const Text("Video Call"),
-                  onTap: () {}
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text('Info'),
+                          content: Text('Video Call is not available yet'),
+                          actions: <Widget>[
+                            TextButton(
+                              child: Text('OK'),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  }
                   //Provider.of<NavigationProvider>(context, listen: false)
                   //  .goTargetPage(context, Routes.webrtc),
                   ),
@@ -398,81 +416,22 @@ class _ChatScreenState extends State<ChatScreen> {
                             showDialog(
                               context: context,
                               builder: (BuildContext context) {
-                                return StatefulBuilder(
-                                  builder: (context, setState) {
-                                    return AlertDialog(
-                                      title: const Text('Add a media'),
-                                      content: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: <Widget>[
-                                          const SizedBox(height: 20),
-                                          _image == null
-                                              ? const Text('No image selected.')
-                                              : Image.file(
-                                                  _image!,
-                                                  width: MediaQuery.of(context)
-                                                          .size
-                                                          .width *
-                                                      0.25,
-                                                  height: MediaQuery.of(context)
-                                                          .size
-                                                          .height *
-                                                      0.25,
-                                                  fit: BoxFit.contain,
-                                                ),
-                                          TextButton(
-                                            onPressed: () async {
-                                              final pickedFile =
-                                                  await ImagePicker().pickImage(
-                                                      source:
-                                                          ImageSource.gallery);
-                                              if (pickedFile != null) {
-                                                setState(() {
-                                                  _image =
-                                                      File(pickedFile.path);
-                                                });
-                                              }
-                                            },
-                                            child: const Text('Choose an image',
-                                                style: TextStyle(
-                                                    fontWeight:
-                                                        FontWeight.w800)),
-                                          ),
-                                        ],
-                                      ),
-                                      actions: <Widget>[
-                                        TextButton(
-                                          child: const Text('Close'),
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                            setState(() {
-                                              _image = null;
-                                            });
-                                          },
-                                        ),
-                                        TextButton(
-                                          child: const Text('Delete'),
-                                          onPressed: () {
-                                            setState(() {
-                                              _image = null;
-                                            });
-                                          },
-                                        ),
-                                        TextButton(
-                                          child: const Text('Send'),
-                                          onPressed: () {
-                                            _sendImage();
-                                            setState(() {
-                                              _image = null;
-                                            });
-                                          },
-                                        ),
-                                      ],
-                                    );
-                                  },
+                                return AlertDialog(
+                                  title: Text('Info'),
+                                  content:
+                                      Text('Image send is not available yet'),
+                                  actions: <Widget>[
+                                    TextButton(
+                                      child: Text('OK'),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                  ],
                                 );
                               },
                             );
+                            //showDialogWithImageSend(context);
                           },
                         ),
                       ),
@@ -495,6 +454,77 @@ class _ChatScreenState extends State<ChatScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Future<dynamic> showDialogWithImageSend(BuildContext context) {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('Add a media'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  const SizedBox(height: 20),
+                  _image == null
+                      ? const Text('No image selected.')
+                      : Image.file(
+                          _image!,
+                          width: MediaQuery.of(context).size.width * 0.25,
+                          height: MediaQuery.of(context).size.height * 0.25,
+                          fit: BoxFit.contain,
+                        ),
+                  TextButton(
+                    onPressed: () async {
+                      final pickedFile = await ImagePicker()
+                          .pickImage(source: ImageSource.gallery);
+                      if (pickedFile != null) {
+                        setState(() {
+                          _image = File(pickedFile.path);
+                        });
+                      }
+                    },
+                    child: const Text('Choose an image',
+                        style: TextStyle(fontWeight: FontWeight.w800)),
+                  ),
+                ],
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('Close'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    setState(() {
+                      _image = null;
+                    });
+                  },
+                ),
+                TextButton(
+                  child: const Text('Delete'),
+                  onPressed: () {
+                    setState(() {
+                      _image = null;
+                    });
+                  },
+                ),
+                TextButton(
+                  child: const Text('Send'),
+                  onPressed: () {
+                    //todo send message
+                    //_sendImage();
+                    setState(() {
+                      _image = null;
+                    });
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 }
