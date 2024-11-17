@@ -11,7 +11,6 @@ import 'package:seezme/core/providers/theme_provider.dart';
 import 'package:seezme/core/services/shared_preferences_service.dart';
 import 'package:seezme/core/utility/constans/constants.dart';
 import 'package:seezme/widgets/avatar_widget.dart';
-import 'package:seezme/widgets/media_message_widget.dart';
 import 'dart:io';
 import 'package:seezme/widgets/message_widget.dart';
 
@@ -30,18 +29,16 @@ class _ChatScreenState extends State<ChatScreen> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final SharedPreferencesService _sharedPreferencesService =
-      SharedPreferencesService();
 
   List<Widget> _drawerItems = [];
   File? _image;
-  String _username = "Username"; // Kullanıcı adını burada saklayın
+  Future<String?> _username = SharedPreferencesService().getUsername();
 
   @override
   void initState() {
     super.initState();
     _fetchChatMessages();
-    _fetchUsername();
+    //_fetchUsername();
   }
 
   @override
@@ -52,15 +49,7 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Future<void> _fetchUsername() async {
-    _firestore.collection("users").snapshots().listen((querySnapshot) {
-      querySnapshot.docs.forEach((element) {
-        if (element.id == _auth.currentUser!.uid) {
-          setState(() {
-            _username = element['username'];
-          });
-        }
-      });
-    });
+    _username;
   }
 
   void _fetchChatMessages() {
@@ -83,20 +72,16 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Future<void> _sendMessage() async {
     if (_controller.text.isNotEmpty) {
-      final message = _controller.text;
-      Provider.of<MessageProvider>(context, listen: false).addMessage({
-        'message': message,
-        'sender': _username,
+      final username = await _username;
+      final getMessage = _controller.text;
+      final message = {
+        'message': getMessage,
+        'sender': username ?? "Unknown",
         'createdAt': Timestamp.now(),
-      });
+        'type': 'text',
+      };
+      await _firestore.collection('chat').add(message);
       _controller.clear();
-      _scrollToBottom();
-      // Firestore'a mesajı kaydet
-      await _firestore.collection('chat').add({
-        'message': message,
-        'sender': _username, // Gönderen kullanıcı adı
-        'createdAt': Timestamp.now(),
-      });
     }
     _fetchChatMessages();
   }
@@ -249,32 +234,55 @@ class _ChatScreenState extends State<ChatScreen> {
                         ),
                         Row(
                           children: [
-                            Column(
-                              children: [
-                                //todo update status
-                                Text(
-                                  _username,
-                                ),
-                                Consumer<StatusProvider>(
-                                    builder: (context, statusProvider, child) {
-                                  return Text(
-                                    statusProvider.status,
-                                    style: TextStyle(
-                                        color: statusProvider.status ==
-                                                Status.statusAvailable
-                                            ? Colors.green
-                                            : statusProvider.status ==
-                                                    Status.statusIdle
-                                                ? Colors.orange
-                                                : statusProvider.status ==
-                                                        Status.statusBusy
-                                                    ? Colors.red
-                                                    : Colors.grey),
-                                  );
-                                }),
-                              ],
+                            Container(
+                              width: sizeWidth * 0.4,
+                              child: Column(
+                                mainAxisSize: MainAxisSize.max,
+                                children: [
+                                  FutureBuilder<String?>(
+                                    future: _username,
+                                    builder: (context, snapshot) {
+                                      if (snapshot.connectionState ==
+                                          ConnectionState.waiting) {
+                                        return CircularProgressIndicator();
+                                      } else if (snapshot.hasError) {
+                                        return Text('Error: ${snapshot.error}');
+                                      } else {
+                                        return Text(
+                                          maxLines: 1,
+                                          snapshot.data ?? '--',
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                        );
+                                      }
+                                    },
+                                  ),
+                                  Consumer<StatusProvider>(builder:
+                                      (context, statusProvider, child) {
+                                    return Text(
+                                      statusProvider.status,
+                                      style: TextStyle(
+                                          color: statusProvider.status ==
+                                                  Status.statusAvailable
+                                              ? Colors.green
+                                              : statusProvider.status ==
+                                                      Status.statusIdle
+                                                  ? Colors.orange
+                                                  : statusProvider.status ==
+                                                          Status.statusBusy
+                                                      ? Colors.red
+                                                      : Colors.grey),
+                                    );
+                                  }),
+                                ],
+                              ),
                             ),
                             PopupMenuButton<String>(
+                              iconSize: 30,
                               icon: Icon(Icons.arrow_drop_down),
                               onSelected: (String value) {
                                 Provider.of<StatusProvider>(context,
@@ -320,12 +328,12 @@ class _ChatScreenState extends State<ChatScreen> {
                 onTap: _showAddItemDialog,
               ),
               ListTile(
-                leading: const Icon(Icons.video_call),
-                title: const Text("Video Call"),
-                onTap: () =>
-                    Provider.of<NavigationProvider>(context, listen: false)
-                        .goTargetPage(context, Routes.webrtc),
-              ),
+                  leading: const Icon(Icons.video_call),
+                  title: const Text("Video Call"),
+                  onTap: () {}
+                  //Provider.of<NavigationProvider>(context, listen: false)
+                  //  .goTargetPage(context, Routes.webrtc),
+                  ),
               ..._drawerItems,
             ],
           ),
@@ -335,27 +343,31 @@ class _ChatScreenState extends State<ChatScreen> {
           children: [
             Expanded(
               child: Consumer<MessageProvider>(
-                  builder: (context, MessageProvider, child) {
-                return ListView.builder(
-                  controller: _scrollController,
-                  reverse: false,
-                  itemCount: MessageProvider.messages.length,
-                  itemBuilder: (context, index) {
-                    final message = MessageProvider.messages[index];
-                    if (message is Map<String, dynamic>) {
-                      return MessageWidget(
-                        message: message['message'],
-                        sender: message['sender'],
-                        createdAt: message['createdAt'],
-                        index: index,
-                      );
-                    } else if (message is File) {
-                      return null; //MediaMessageWidget(media: message, index: index);
-                    }
-                    return null;
-                  },
-                );
-              }),
+                builder: (context, messageProvider, child) {
+                  return ListView.builder(
+                    controller: _scrollController,
+                    reverse: false,
+                    itemCount: messageProvider.messages.length,
+                    itemBuilder: (context, index) {
+                      final message = messageProvider.messages[index];
+                      if (message['type'] == 'text') {
+                        return MessageWidget(
+                          message: message['message'],
+                          sender: message['sender'] ?? _username,
+                          createdAt: message['createdAt'],
+                          index: index,
+                        );
+                      } else if (message['type'] == 'media') {
+                        return Image.network(
+                          message['mediaUrl'],
+                          fit: BoxFit.cover,
+                        );
+                      }
+                      return null;
+                    },
+                  );
+                },
+              ),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -379,6 +391,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         fillColor: Colors.grey[200],
                         contentPadding: const EdgeInsets.symmetric(
                             vertical: 10.0, horizontal: 20.0),
+                        //todo media file upload button, "must have billing account"
                         prefixIcon: IconButton(
                           icon: Icon(Icons.add, color: Colors.grey[600]),
                           onPressed: () {
@@ -474,7 +487,6 @@ class _ChatScreenState extends State<ChatScreen> {
                         icon: const Icon(Icons.send, color: Colors.white),
                         onPressed: () {
                           _sendMessage();
-                          _controller.clear();
                         }),
                   ),
                 ],

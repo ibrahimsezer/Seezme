@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:google_sign_in/google_sign_in.dart';
+//import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
 import 'package:seezme/core/providers/navigaton_provider.dart';
 import 'package:seezme/core/services/shared_preferences_service.dart';
@@ -18,7 +18,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  //final GoogleSignIn _googleSignIn = GoogleSignIn();
   final SharedPreferencesService _sharedPreferencesService =
       SharedPreferencesService();
 
@@ -66,27 +66,28 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  Future<void> _handleGoogleSignIn() async {
-    try {
-      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-      if (googleUser != null) {
-        final GoogleSignInAuthentication googleAuth =
-            await googleUser.authentication;
-        final String? idToken = googleAuth.idToken;
+//todo add google sign in
+  // Future<void> _handleGoogleSignIn() async {
+  //   try {
+  //     final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+  //     if (googleUser != null) {
+  //       final GoogleSignInAuthentication googleAuth =
+  //           await googleUser.authentication;
+  //       final String? idToken = googleAuth.idToken;
 
-        // Save login status
-        await _sharedPreferencesService.setLoggedIn(true);
-        // Navigate to chat screen
-        Provider.of<NavigationProvider>(context, listen: false)
-            .goTargetPage(context, Routes.chatScreen);
-      } else {
-        _showErrorSnackbar('Google Sign-In failed. Please try again.');
-      }
-    } catch (error) {
-      _showErrorSnackbar('Google Sign-In failed. Please try again.');
-      print(error);
-    }
-  }
+  //       // Save login status
+  //       await _sharedPreferencesService.setLoggedIn(true);
+  //       // Navigate to chat screen
+  //       Provider.of<NavigationProvider>(context, listen: false)
+  //           .goTargetPage(context, Routes.chatScreen);
+  //     } else {
+  //       _showErrorSnackbar('Google Sign-In failed. Please try again.');
+  //     }
+  //   } catch (error) {
+  //     _showErrorSnackbar('Google Sign-In failed. Please try again.');
+  //     print(error);
+  //   }
+  // }
 
   void _showErrorSnackbar(String message) {
     final snackBar = SnackBar(

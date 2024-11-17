@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPreferencesService {
@@ -8,10 +9,15 @@ class SharedPreferencesService {
 
   Future<bool> isLoggedIn() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      return prefs.getBool(_isLoggedInKey) ?? false;
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        return true;
+      } else {
+        final prefs = await SharedPreferences.getInstance();
+        return prefs.getBool(_isLoggedInKey) ?? false;
+      }
     } catch (e) {
-      print('Error getting shared preferences: $e');
+      print('Error checking login status: $e');
       return false;
     }
   }
