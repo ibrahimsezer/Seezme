@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:seezme/core/providers/message_provider.dart';
 import 'package:seezme/core/utility/constans/constants.dart';
+import 'package:seezme/core/viewmodels/chat_view_model.dart';
 import 'package:seezme/widgets/avatar_widget.dart';
 
 class MessageWidget extends StatelessWidget {
@@ -41,12 +41,8 @@ class MessageWidget extends StatelessWidget {
                   child: const Text('Delete'),
                   onPressed: () async {
                     // Firestore'dan mesajı sil
-                    final messageProvider =
-                        Provider.of<MessageProvider>(context, listen: false);
-                    final message = messageProvider.messages[index];
-                    final messageId =
-                        message['id']; // Mesajın Firestore'daki ID'si
-                    await _firestore.collection('chat').doc(messageId).delete();
+                    Provider.of<ChatViewModel>(context, listen: false)
+                        .deleteMessage(_firestore.collection('chats').doc().id);
                     Navigator.of(context).pop();
                   },
                 ),
@@ -67,11 +63,7 @@ class MessageWidget extends StatelessWidget {
             Row(
               children: [
                 InkWell(
-                  onTap: () {
-                    //todo (not working this code here but working on sidepage avatar)
-                    //Provider.of<NavigationProvider>(context, listen: false)
-                    //.goTargetPage(context, Routes.profile);
-                  },
+                  onTap: () {},
                   child: AvatarWidget(),
                 ),
                 const SizedBox(width: 10),

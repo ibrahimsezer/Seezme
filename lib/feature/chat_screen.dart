@@ -1,19 +1,15 @@
-import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
-import 'package:seezme/core/providers/message_provider.dart';
+import 'package:seezme/core/models/chat_model.dart';
 import 'package:seezme/core/providers/navigaton_provider.dart';
-import 'package:seezme/core/providers/status_provider.dart';
 import 'package:seezme/core/providers/theme_provider.dart';
 import 'package:seezme/core/services/shared_preferences_service.dart';
 import 'package:seezme/core/utility/constans/constants.dart';
+import 'package:seezme/core/viewmodels/chat_view_model.dart';
+import 'package:seezme/core/viewmodels/user_view_model.dart';
 import 'package:seezme/widgets/avatar_widget.dart';
-import 'dart:io';
 import 'package:seezme/widgets/message_widget.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -28,137 +24,42 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final FirebaseStorage _storage = FirebaseStorage.instance;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   List<Widget> _drawerItems = [];
-  File? _image;
   Future<String?> _username = SharedPreferencesService().getUsername();
+  //new
+  ChatViewModel _chatViewModel = ChatViewModel();
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _fetchChatMessages();
+    _chatViewModel.fetchMessages();
     _controller.addListener(_handleKeyPress);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollToBottom();
     });
-
-    //_fetchUsername();
-  }
-
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    _controller.removeListener(_handleKeyPress);
-    _controller.dispose();
-    _scrollController.dispose();
-    super.dispose();
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      _fetchChatMessages();
+      _chatViewModel.fetchMessages();
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _scrollToBottom();
-        log("scrollBottom Changed!!\n\n");
       });
     }
   }
 
   void _handleKeyPress() {
     if (_controller.text.isNotEmpty && _controller.text.endsWith('\n')) {
-      _controller.text =
-          _controller.text.trim(); // Remove the newline character
-      _sendMessage();
-    }
-  }
-
-  Future<void> _fetchUsername() async {
-    _username;
-  }
-
-  Future<String> _fetchCurrentUserDetails() async {
-    final currentUser = _auth.currentUser;
-    if (currentUser != null) {
-      final userDoc =
-          await _firestore.collection('users').doc(currentUser.uid).get();
-      if (userDoc.exists) {
-        final userData = userDoc.data();
-        final userId = userDoc.id;
-        final username = userData?['username'];
-        return userId;
-      }
-    }
-    return "unknown";
-  }
-
-  void _fetchChatMessages() {
-    _firestore.collection('chat').snapshots().listen((querySnapshot) {
-      final messages = querySnapshot.docs.map((doc) {
-        final data = doc.data();
-        data['id'] = doc.id;
-        return data;
-      }).toList();
-
-      messages.sort((a, b) {
-        Timestamp aTimestamp = a['createdAt'];
-        Timestamp bTimestamp = b['createdAt'];
-        return aTimestamp.compareTo(bTimestamp);
-      });
-
-      Provider.of<MessageProvider>(context, listen: false).messages = messages;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _scrollToBottom();
-      });
-    });
-  }
-
-  Future<void> _sendMessage() async {
-    if (_controller.text.isNotEmpty) {
-      final username = await _username;
-      final getMessage = _controller.text;
-      final message = {
-        'message': getMessage,
-        'sender': username ?? "Unknown",
-        'createdAt': Timestamp.now(),
-        'type': 'text',
-      };
-      await _firestore.collection('chat').add(message);
-      _controller.clear();
-    }
-    _fetchChatMessages();
-  }
-
-  Future<void> _sendImage() async {
-    if (_image != null) {
-      // Resmi Firebase Storage'a yükle
-      final storageRef = _storage
-          .ref()
-          .child('chat_images/${DateTime.now().millisecondsSinceEpoch}.jpg');
-      final uploadTask = storageRef.putFile(_image!);
-      final snapshot = await uploadTask.whenComplete(() => null);
-      final downloadUrl = await snapshot.ref.getDownloadURL();
-
-      // Firestore'a resmi kaydet
-      await _firestore.collection('chat').add({
-        'message': 'Image',
-        'imageUrl': downloadUrl,
-        'sender': _username, // Gönderen kullanıcı adı
-        'createdAt': Timestamp.now(),
-      });
-
-      Provider.of<MessageProvider>(context, listen: false).addMediaMessage({
-        'message': 'Image',
-        'imageUrl': downloadUrl,
-        'sender': _username,
-        'createdAt': Timestamp.now(),
-      });
-      _scrollToBottom();
-      Navigator.of(context).pop();
+      _controller.text = _controller.text.trim();
+      _chatViewModel.sendMessage(ChatModel(
+        sender: FirebaseAuth.instance.currentUser?.email ?? "Unknown",
+        message: _controller.text,
+        type: 'text',
+        createdAt: Timestamp.now(),
+      ));
     }
   }
 
@@ -168,7 +69,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
         _scrollController.position.maxScrollExtent + 200,
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeOut,
-      ); //todo check this
+      );
     }
   }
 
@@ -215,10 +116,12 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+    final chatVM = Provider.of<ChatViewModel>(context, listen: false);
+    final userVM = Provider.of<UserViewModel>(context, listen: false);
     double sizeWidth = MediaQuery.of(context).size.width;
     return MaterialApp(
       title: Titles.mainTitle,
-      theme: defaultTheme, //todo rework theme
+      theme: defaultTheme,
       darkTheme: ThemeData.dark(),
       themeMode: Provider.of<ThemeProvider>(context).currentTheme,
       home: Scaffold(
@@ -309,18 +212,45 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                                       }
                                     },
                                   ),
-                                  Consumer<StatusProvider>(builder:
+                                  Consumer<UserViewModel>(builder:
                                       (context, statusProvider, child) {
                                     return Text(
-                                      statusProvider.status,
+                                      statusProvider.users
+                                          .firstWhere((element) =>
+                                              element.email ==
+                                              FirebaseAuth
+                                                  .instance.currentUser?.email)
+                                          .status,
                                       style: TextStyle(
-                                          color: statusProvider.status ==
+                                          color: statusProvider.users
+                                                      .firstWhere((element) =>
+                                                          element.email ==
+                                                          FirebaseAuth
+                                                              .instance
+                                                              .currentUser
+                                                              ?.email)
+                                                      .status ==
                                                   Status.statusAvailable
                                               ? Colors.green
-                                              : statusProvider.status ==
+                                              : statusProvider.users
+                                                          .firstWhere((element) =>
+                                                              element.email ==
+                                                              FirebaseAuth
+                                                                  .instance
+                                                                  .currentUser
+                                                                  ?.email)
+                                                          .status ==
                                                       Status.statusIdle
                                                   ? Colors.orange
-                                                  : statusProvider.status ==
+                                                  : statusProvider.users
+                                                              .firstWhere((element) =>
+                                                                  element
+                                                                      .email ==
+                                                                  FirebaseAuth
+                                                                      .instance
+                                                                      .currentUser
+                                                                      ?.email)
+                                                              .status ==
                                                           Status.statusBusy
                                                       ? Colors.red
                                                       : Colors.grey),
@@ -333,9 +263,11 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                               iconSize: 30,
                               icon: Icon(Icons.arrow_drop_down),
                               onSelected: (String value) {
-                                Provider.of<StatusProvider>(context,
+                                Provider.of<UserViewModel>(context,
                                         listen: false)
-                                    .updateStatus(value, "");
+                                    .updateUserStatus(
+                                        FirebaseAuth.instance.currentUser!.uid,
+                                        value);
                               },
                               itemBuilder: (BuildContext context) {
                                 return [
@@ -396,19 +328,12 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                         );
                       },
                     );
-                  }
-                  //Provider.of<NavigationProvider>(context, listen: false)
-                  //  .goTargetPage(context, Routes.webrtc),
-                  ),
+                  }),
               ListTile(
                 leading: const Icon(Icons.people),
                 title: const Text('Active Users'),
                 onTap: () async {
-                  final usersSnapshot =
-                      await _firestore.collection('users').get();
-                  final users =
-                      usersSnapshot.docs.map((doc) => doc.data()).toList();
-
+                  userVM.fetchUsers();
                   showDialog(
                     context: context,
                     builder: (BuildContext context) {
@@ -418,20 +343,19 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                           width: double.maxFinite,
                           child: ListView.builder(
                             shrinkWrap: true,
-                            itemCount: users.length,
+                            itemCount: userVM.users.length,
                             itemBuilder: (context, index) {
-                              final user = users[index];
+                              final user = userVM.users[index];
                               return ListTile(
-                                title: Text(user['username'] ?? 'Unknown'),
-                                subtitle: Text(user['status'] ?? 'Unknown'),
+                                title: Text(user.username),
+                                subtitle: Text(user.status),
                                 leading: Icon(
                                   Icons.circle,
-                                  color: user['status'] ==
-                                          Status.statusAvailable
+                                  color: user.status == Status.statusAvailable
                                       ? Colors.green
-                                      : user['status'] == Status.statusIdle
+                                      : user.status == Status.statusIdle
                                           ? Colors.orange
-                                          : user['status'] == Status.statusBusy
+                                          : user.status == Status.statusBusy
                                               ? Colors.red
                                               : Colors.grey,
                                 ),
@@ -460,24 +384,25 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
         body: Column(
           children: [
             Expanded(
-              child: Consumer<MessageProvider>(
-                builder: (context, messageProvider, child) {
+              child: Consumer<ChatViewModel>(
+                builder: (context, chatVM, child) {
                   return ListView.builder(
                     controller: _scrollController,
                     reverse: false,
-                    itemCount: messageProvider.messages.length,
+                    itemCount: chatVM.messages.length,
                     itemBuilder: (context, index) {
-                      final message = messageProvider.messages[index];
-                      if (message['type'] == 'text') {
+                      final message = chatVM.messages[index];
+                      if (message.type == 'text') {
                         return MessageWidget(
-                          message: message['message'],
-                          sender: message['sender'] ?? _username,
-                          createdAt: message['createdAt'],
+                          message: message.message,
+                          sender: message.sender,
+                          createdAt: message.createdAt,
                           index: index,
                         );
-                      } else if (message['type'] == 'media') {
+                      } else if (message.type == 'media') {
                         return Image.network(
-                          message['mediaUrl'],
+                          //todo return to image message model
+                          message.message,
                           fit: BoxFit.cover,
                         );
                       }
@@ -509,7 +434,6 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                         fillColor: Colors.grey[200],
                         contentPadding: const EdgeInsets.symmetric(
                             vertical: 10.0, horizontal: 20.0),
-                        //todo media file upload button, "must have billing account"
                         prefixIcon: IconButton(
                           icon: Icon(Icons.add, color: Colors.grey[600]),
                           onPressed: () {
@@ -531,12 +455,19 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                                 );
                               },
                             );
-                            //showDialogWithImageSend(context);
                           },
                         ),
                       ),
                       onSubmitted: (value) {
-                        _sendMessage();
+                        chatVM.sendMessage(
+                          ChatModel(
+                            sender: FirebaseAuth.instance.currentUser?.email ??
+                                "Unknown",
+                            message: value,
+                            type: 'text',
+                            createdAt: Timestamp.now(),
+                          ),
+                        );
                       },
                     ),
                   ),
@@ -548,7 +479,16 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                     child: IconButton(
                         icon: const Icon(Icons.send, color: Colors.white),
                         onPressed: () {
-                          _sendMessage();
+                          chatVM.sendMessage(
+                            ChatModel(
+                              sender:
+                                  FirebaseAuth.instance.currentUser?.email ??
+                                      "Unknown",
+                              message: _controller.text,
+                              type: 'text',
+                              createdAt: Timestamp.now(),
+                            ),
+                          );
                         }),
                   ),
                 ],
@@ -557,77 +497,6 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
           ],
         ),
       ),
-    );
-  }
-
-  Future<dynamic> showDialogWithImageSend(BuildContext context) {
-    return showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return AlertDialog(
-              title: const Text('Add a media'),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  const SizedBox(height: 20),
-                  _image == null
-                      ? const Text('No image selected.')
-                      : Image.file(
-                          _image!,
-                          width: MediaQuery.of(context).size.width * 0.25,
-                          height: MediaQuery.of(context).size.height * 0.25,
-                          fit: BoxFit.contain,
-                        ),
-                  TextButton(
-                    onPressed: () async {
-                      final pickedFile = await ImagePicker()
-                          .pickImage(source: ImageSource.gallery);
-                      if (pickedFile != null) {
-                        setState(() {
-                          _image = File(pickedFile.path);
-                        });
-                      }
-                    },
-                    child: const Text('Choose an image',
-                        style: TextStyle(fontWeight: FontWeight.w800)),
-                  ),
-                ],
-              ),
-              actions: <Widget>[
-                TextButton(
-                  child: const Text('Close'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    setState(() {
-                      _image = null;
-                    });
-                  },
-                ),
-                TextButton(
-                  child: const Text('Delete'),
-                  onPressed: () {
-                    setState(() {
-                      _image = null;
-                    });
-                  },
-                ),
-                TextButton(
-                  child: const Text('Send'),
-                  onPressed: () {
-                    //todo send message
-                    //_sendImage();
-                    setState(() {
-                      _image = null;
-                    });
-                  },
-                ),
-              ],
-            );
-          },
-        );
-      },
     );
   }
 }

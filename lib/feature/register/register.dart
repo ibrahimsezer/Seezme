@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-//import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
 import 'package:seezme/core/providers/navigaton_provider.dart';
 import 'package:seezme/core/utility/constans/constants.dart';
@@ -21,7 +20,6 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController _passwordRetryController =
       TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  //final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   Future<void> _registerWithEmail() async {
     if (_emailController.text.isEmpty ||
@@ -64,40 +62,6 @@ class _RegisterPageState extends State<RegisterPage> {
     }
   }
   //todo added register with google
-  // Future<void> _registerWithGoogle() async {
-  //   try {
-  //     final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-  //     if (googleUser != null) {
-  //       final GoogleSignInAuthentication googleAuth =
-  //           await googleUser.authentication;
-  //       final AuthCredential credential = GoogleAuthProvider.credential(
-  //         accessToken: googleAuth.accessToken,
-  //         idToken: googleAuth.idToken,
-  //       );
-
-  //       UserCredential userCredential =
-  //           await _auth.signInWithCredential(credential);
-
-  //       // Save user info to Firestore
-  //       await FirebaseFirestore.instance
-  //           .collection('users')
-  //           .doc(userCredential.user!.uid)
-  //           .set({
-  //         'email': userCredential.user!.email,
-  //         'createdAt': Timestamp.now(),
-  //       });
-
-  //       // Navigate to chat screen
-  //       Provider.of<NavigationProvider>(context, listen: false)
-  //           .goTargetPage(context, Routes.chatScreen);
-  //     } else {
-  //       _showErrorSnackbar('Google Sign-In failed. Please try again.');
-  //     }
-  //   } catch (e) {
-  //     _showErrorSnackbar('Google Sign-In failed. Please try again.');
-  //     print(e);
-  //   }
-  // }
 
   void _showErrorSnackbar(String message) {
     final snackBar = SnackBar(
@@ -105,6 +69,14 @@ class _RegisterPageState extends State<RegisterPage> {
       duration: const Duration(seconds: 3),
     );
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    _passwordRetryController.dispose();
+    super.dispose();
   }
 
   @override
@@ -146,9 +118,6 @@ class _RegisterPageState extends State<RegisterPage> {
                 AuthenticationButtonWidget(
                     function: _registerWithEmail,
                     authenticationType: RegisterType.email),
-                // AuthenticationButtonWidget(//todo: google sign in
-                //     function: _registerWithGoogle,
-                //     authenticationType: RegisterType.google),
                 SizedBox(height: 16),
                 GestureDetector(
                   onTap: () {
@@ -169,13 +138,5 @@ class _RegisterPageState extends State<RegisterPage> {
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    _passwordRetryController.dispose();
-    super.dispose();
   }
 }

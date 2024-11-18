@@ -1,6 +1,18 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+class AuthService {
+  Future<void> saveLoginStatus(bool isLoggedIn) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isLoggedIn', isLoggedIn);
+  }
+
+  Future<bool> getLoginStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('isLoggedIn') ?? false;
+  }
+}
+
 class SharedPreferencesService {
   //todo rework SharedPreferencesService
   static const String _isLoggedInKey = 'isLoggedIn';

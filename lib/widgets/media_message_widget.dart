@@ -1,13 +1,16 @@
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:seezme/core/providers/message_provider.dart';
 import 'package:seezme/core/utility/constans/constants.dart';
+import 'package:seezme/core/viewmodels/chat_view_model.dart';
 
 class MediaMessageWidget extends StatelessWidget {
   final File media;
   final int index;
-  const MediaMessageWidget({
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  MediaMessageWidget({
     super.key,
     required this.media,
     required this.index,
@@ -33,8 +36,8 @@ class MediaMessageWidget extends StatelessWidget {
                 TextButton(
                   child: const Text('Delete'),
                   onPressed: () {
-                    Provider.of<MessageProvider>(context, listen: false)
-                        .removeMessage(index);
+                    Provider.of<ChatViewModel>(context, listen: false)
+                        .deleteMessage(_firestore.collection('chats').doc().id);
                     Navigator.of(context).pop();
                   },
                 ),
