@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:seezme/core/services/shared_preferences_service.dart';
+import 'package:seezme/core/services/auth_service.dart';
 import 'package:seezme/feature/login/login.dart';
 
 class NavigationProvider with ChangeNotifier {
@@ -15,8 +15,8 @@ class NavigationProvider with ChangeNotifier {
     await FirebaseAuth.instance.signOut();
 
     // SharedPreferences'dan kullanıcı bilgilerini temizle
-    final sharedPreferencesService = SharedPreferencesService();
-    await sharedPreferencesService.clearUserData();
+    final _auth = AuthService();
+    await _auth.clearUserData();
 
     Navigator.pushAndRemoveUntil(
       context,

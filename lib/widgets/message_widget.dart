@@ -10,6 +10,7 @@ class MessageWidget extends StatelessWidget {
   final String sender;
   final Timestamp createdAt;
   final int index;
+  final String type;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   MessageWidget({
@@ -18,6 +19,7 @@ class MessageWidget extends StatelessWidget {
     required this.sender,
     required this.createdAt,
     required this.index,
+    required this.type,
   });
 
   @override

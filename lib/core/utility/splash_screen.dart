@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:seezme/core/services/shared_preferences_service.dart';
+import 'package:seezme/core/services/auth_service.dart';
 import 'package:seezme/core/utility/constans/constants.dart';
 import 'package:seezme/feature/chat_screen.dart';
 import 'package:seezme/feature/login/login.dart';
@@ -17,8 +17,8 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   _navigateToNextPage() async {
-    final sharedPreferencesService = SharedPreferencesService();
-    final isLoggedIn = await sharedPreferencesService.isLoggedIn();
+    final sharedPreferencesService = AuthService();
+    final isLoggedIn = await sharedPreferencesService.getLoginStatus();
 
     await Future.delayed(Duration(seconds: 1));
     if (isLoggedIn) {

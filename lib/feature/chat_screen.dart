@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:seezme/core/models/chat_model.dart';
 import 'package:seezme/core/providers/navigaton_provider.dart';
 import 'package:seezme/core/providers/theme_provider.dart';
-import 'package:seezme/core/services/shared_preferences_service.dart';
+import 'package:seezme/core/services/auth_service.dart';
 import 'package:seezme/core/utility/constans/constants.dart';
 import 'package:seezme/core/viewmodels/chat_view_model.dart';
 import 'package:seezme/core/viewmodels/user_view_model.dart';
@@ -26,15 +26,17 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
   final ScrollController _scrollController = ScrollController();
 
   List<Widget> _drawerItems = [];
-  Future<String?> _username = SharedPreferencesService().getUsername();
+  Future<String?> _username = AuthService().getUsername();
   //new
   ChatViewModel _chatViewModel = ChatViewModel();
+  UserViewModel _userViewModel = UserViewModel();
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _chatViewModel.fetchMessages();
+    _userViewModel.fetchUsers();
     _controller.addListener(_handleKeyPress);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollToBottom();
@@ -188,7 +190,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                             Container(
                               width: sizeWidth * 0.4,
                               child: Column(
-                                mainAxisSize: MainAxisSize.max,
+                                mainAxisSize: MainAxisSize.min,
                                 children: [
                                   FutureBuilder<String?>(
                                     future: _username,
@@ -214,42 +216,36 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                                   ),
                                   Consumer<UserViewModel>(builder:
                                       (context, statusProvider, child) {
+                                    final user =
+                                        FirebaseAuth.instance.currentUser;
                                     return Text(
                                       statusProvider.users
                                           .firstWhere((element) =>
-                                              element.email ==
-                                              FirebaseAuth
-                                                  .instance.currentUser?.email)
+                                              element.email == user?.email)
                                           .status,
                                       style: TextStyle(
                                           color: statusProvider.users
                                                       .firstWhere((element) =>
                                                           element.email ==
-                                                          FirebaseAuth
-                                                              .instance
-                                                              .currentUser
-                                                              ?.email)
+                                                          user?.email)
                                                       .status ==
                                                   Status.statusAvailable
                                               ? Colors.green
                                               : statusProvider.users
-                                                          .firstWhere((element) =>
-                                                              element.email ==
-                                                              FirebaseAuth
-                                                                  .instance
-                                                                  .currentUser
-                                                                  ?.email)
+                                                          .firstWhere(
+                                                              (element) =>
+                                                                  element
+                                                                      .email ==
+                                                                  user?.email)
                                                           .status ==
                                                       Status.statusIdle
                                                   ? Colors.orange
                                                   : statusProvider.users
-                                                              .firstWhere((element) =>
-                                                                  element
-                                                                      .email ==
-                                                                  FirebaseAuth
-                                                                      .instance
-                                                                      .currentUser
-                                                                      ?.email)
+                                                              .firstWhere(
+                                                                  (element) =>
+                                                                      element
+                                                                          .email ==
+                                                                      user?.email)
                                                               .status ==
                                                           Status.statusBusy
                                                       ? Colors.red
@@ -263,11 +259,10 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                               iconSize: 30,
                               icon: Icon(Icons.arrow_drop_down),
                               onSelected: (String value) {
+                                final user = FirebaseAuth.instance.currentUser;
                                 Provider.of<UserViewModel>(context,
                                         listen: false)
-                                    .updateUserStatus(
-                                        FirebaseAuth.instance.currentUser!.uid,
-                                        value);
+                                    .updateUserStatus(user!.uid, value);
                               },
                               itemBuilder: (BuildContext context) {
                                 return [
@@ -398,6 +393,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                           sender: message.sender,
                           createdAt: message.createdAt,
                           index: index,
+                          type: message.type,
                         );
                       } else if (message.type == 'media') {
                         return Image.network(
@@ -463,11 +459,12 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                           ChatModel(
                             sender: FirebaseAuth.instance.currentUser?.email ??
                                 "Unknown",
-                            message: value,
+                            message: _controller.text,
                             type: 'text',
                             createdAt: Timestamp.now(),
                           ),
                         );
+                        _controller.clear();
                       },
                     ),
                   ),
@@ -489,6 +486,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                               createdAt: Timestamp.now(),
                             ),
                           );
+                          _controller.clear();
                         }),
                   ),
                 ],

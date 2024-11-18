@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:seezme/core/services/shared_preferences_service.dart';
+import 'package:seezme/core/services/auth_service.dart';
 import 'package:seezme/core/utility/constans/constants.dart';
 import 'package:seezme/widgets/target_button_widget.dart';
 
@@ -17,8 +17,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
-    getUser = SharedPreferencesService().getUsername();
-    getEmail = SharedPreferencesService().getEmail();
+    getUser = AuthService().getUsername();
+    getEmail = AuthService().getEmail();
   }
 
   @override

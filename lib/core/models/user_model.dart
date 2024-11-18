@@ -4,7 +4,7 @@ class UserModel {
   final String email;
   final String username;
   final String status;
-  final DateTime createdAt;
+  final Timestamp createdAt;
 
   UserModel({
     required this.email,
@@ -18,7 +18,7 @@ class UserModel {
       email: data['email'] ?? '',
       username: data['username'] ?? '',
       status: data['status'] ?? 'offline',
-      createdAt: (data['createdAt'] as Timestamp).toDate(),
+      createdAt: (data['createdAt'] as Timestamp),
     );
   }
 

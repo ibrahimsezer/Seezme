@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:seezme/core/providers/navigaton_provider.dart';
-import 'package:seezme/core/services/shared_preferences_service.dart';
+import 'package:seezme/core/services/auth_service.dart';
 import 'package:seezme/core/utility/constans/constants.dart';
 import 'package:seezme/widgets/authentication_button_widget.dart';
 import 'package:seezme/widgets/custom_textfield_widget.dart';
@@ -18,8 +18,7 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   //final GoogleSignIn _googleSignIn = GoogleSignIn();
-  final SharedPreferencesService _sharedPreferencesService =
-      SharedPreferencesService();
+  final AuthService _auth = AuthService();
 
   Future<void> _login() async {
     final usernameOrEmail = _usernameController.text;
@@ -49,9 +48,9 @@ class _LoginPageState extends State<LoginPage> {
         final email = userDoc['email'];
 
         // Save login status and username
-        await _sharedPreferencesService.setLoggedIn(true);
-        await _sharedPreferencesService.setUsername(username);
-        await _sharedPreferencesService.setEmail(email);
+        await _auth.saveLoginStatus(true);
+        await _auth.setUsername(username);
+        await _auth.setEmail(email);
 
         // Navigate to chat screen
         Navigator.pushReplacementNamed(context, Routes.chatScreen);

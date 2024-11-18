@@ -30,7 +30,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => ChatViewModel()),
         ChangeNotifierProvider(create: (_) => UserViewModel()),
       ],
-      child: MyApp(initialRoute: Routes.splashScreen),
+      child: MyApp(initialRoute: Routes.login),
     ),
   );
 }
