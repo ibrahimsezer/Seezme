@@ -5,7 +5,7 @@ import 'package:seezme/core/utility/constans/constants.dart';
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
+  get auth => _auth;
   Future<bool> isLoggedIn() async {
     return _auth.currentUser != null;
   }

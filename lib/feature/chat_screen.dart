@@ -204,7 +204,6 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                                   iconSize: 30,
                                   icon: Icon(Icons.arrow_drop_down),
                                   onSelected: (String value) async {
-                                    //todo fix this 2
                                     String uid = FirebaseAuth
                                             .instance.currentUser?.uid ??
                                         "";
@@ -240,6 +239,13 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                                         child: Text(
                                           Status.statusBusy,
                                           style: TextStyle(color: Colors.red),
+                                        ),
+                                      ),
+                                      PopupMenuItem<String>(
+                                        value: Status.statusOffline,
+                                        child: Text(
+                                          Status.statusOffline,
+                                          style: TextStyle(color: Colors.grey),
                                         ),
                                       ),
                                     ];
@@ -287,47 +293,52 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                 leading: const Icon(Icons.people),
                 title: const Text(Titles.activeUsers),
                 onTap: () async {
-                  //todo fix this
-                  Provider.of<UserViewModel>(context, listen: false)
-                      .fetchUsers();
+                  userViewModel.fetchUsers();
+                  userViewModel.refreshStatus();
                   showDialog(
                     context: context,
                     builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: const Text(Titles.activeUsers),
-                        content: SizedBox(
-                          width: double.maxFinite,
-                          child: ListView.builder(
-                            shrinkWrap: true,
-                            itemCount: _userViewModel.users.length,
-                            itemBuilder: (context, index) {
-                              final user = _userViewModel.users[index];
-                              return ListTile(
-                                title: Text(user.username),
-                                subtitle: Text(user.status),
-                                leading: Icon(
-                                  Icons.circle,
-                                  color: user.status == Status.statusAvailable
-                                      ? Colors.green
-                                      : user.status == Status.statusIdle
-                                          ? Colors.orange
-                                          : user.status == Status.statusBusy
-                                              ? Colors.red
-                                              : Colors.grey,
-                                ),
-                              );
-                            },
+                      return Consumer<UserViewModel>(
+                          builder: (context, userViewModel, child) {
+                        return AlertDialog(
+                          title: const Text(Titles.activeUsers),
+                          content: SizedBox(
+                            width: double.maxFinite,
+                            child: ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: userViewModel.users.length,
+                              itemBuilder: (context, index) {
+                                final user = userViewModel.users[index];
+                                return ListTile(
+                                  title: Text(user.username),
+                                  subtitle: Text(user.status),
+                                  leading: Icon(
+                                    Icons.circle,
+                                    color: user.status == Status.statusAvailable
+                                        ? Colors.green
+                                        : user.status == Status.statusIdle
+                                            ? Colors.orange
+                                            : user.status == Status.statusBusy
+                                                ? Colors.red
+                                                : user.status ==
+                                                        Status.statusOffline
+                                                    ? Colors.grey
+                                                    : Colors.grey,
+                                  ),
+                                );
+                              },
+                            ),
                           ),
-                        ),
-                        actions: <Widget>[
-                          TextButton(
-                            child: const Text('Close'),
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                        ],
-                      );
+                          actions: <Widget>[
+                            TextButton(
+                              child: const Text('Close'),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                          ],
+                        );
+                      });
                     },
                   );
                 },

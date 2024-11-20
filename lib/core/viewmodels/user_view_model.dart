@@ -16,6 +16,11 @@ class UserViewModel with ChangeNotifier {
   String _status = Status.statusOffline;
   String get status => _status;
 
+  void refreshStatus() {
+    _status;
+    notifyListeners();
+  }
+
   void updateStatus(String newStatus) {
     _status = newStatus;
     notifyListeners();
