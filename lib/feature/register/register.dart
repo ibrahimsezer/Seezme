@@ -1,9 +1,10 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:seezme/core/providers/navigaton_provider.dart';
+import 'package:seezme/core/services/auth_service.dart';
 import 'package:seezme/core/utility/constans/constants.dart';
+import 'package:seezme/core/utility/helper_function.dart';
 import 'package:seezme/widgets/authentication_button_widget.dart';
 import 'package:seezme/widgets/custom_textfield_widget.dart';
 
@@ -19,57 +20,35 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _passwordRetryController =
       TextEditingController();
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final AuthService _authService = AuthService();
 
   Future<void> _registerWithEmail() async {
     if (_emailController.text.isEmpty ||
         _passwordController.text.isEmpty ||
         _passwordRetryController.text.isEmpty) {
-      _showErrorSnackbar('All fields are required.');
+      showErrorSnackbar('All fields are required.', context);
       return;
     }
 
     if (_passwordController.text != _passwordRetryController.text) {
-      _showErrorSnackbar('Passwords do not match.');
+      showErrorSnackbar('Passwords do not match.', context);
       return;
     }
 
     try {
-      UserCredential userCredential =
-          await _auth.createUserWithEmailAndPassword(
-        email: _emailController.text,
-        password: _passwordController.text,
-      );
-
-      // Save user info to Firestore
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userCredential.user!.uid)
-          .set({
-        'email': _emailController.text,
-        'password': _passwordController.text,
-        'username': _emailController.text.split('@').first,
-        'createdAt': Timestamp.now(),
-      });
+      _authService.register(_emailController.text, _passwordController.text);
 
       // Navigate to login page
       Provider.of<NavigationProvider>(context, listen: false)
           .goTargetPage(context, Routes.login);
     } catch (e) {
-      _showErrorSnackbar(
-          'Sign up with a real email. (Password must be minimum 6 characters)');
+      showErrorSnackbar(
+          'Sign up with a real email. (Password must be minimum 6 characters)',
+          context);
       print(e);
     }
   }
   //todo added register with google
-
-  void _showErrorSnackbar(String message) {
-    final snackBar = SnackBar(
-      content: Text(message),
-      duration: const Duration(seconds: 3),
-    );
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  }
 
   @override
   void dispose() {

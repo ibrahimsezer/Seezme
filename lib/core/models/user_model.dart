@@ -5,12 +5,16 @@ class UserModel {
   final String username;
   final String status;
   final Timestamp createdAt;
+  final String password;
+  final String uid;
 
   UserModel({
     required this.email,
     required this.username,
     required this.status,
     required this.createdAt,
+    required this.password,
+    required this.uid,
   });
 
   factory UserModel.fromFirestore(Map<String, dynamic> data) {
@@ -19,6 +23,8 @@ class UserModel {
       username: data['username'] ?? '',
       status: data['status'] ?? 'offline',
       createdAt: (data['createdAt'] as Timestamp),
+      password: data['password'] ?? '',
+      uid: data['uid'] ?? '',
     );
   }
 
@@ -28,6 +34,8 @@ class UserModel {
       'username': username,
       'status': status,
       'createdAt': createdAt,
+      'password': password,
+      'uid': uid,
     };
   }
 }

@@ -17,8 +17,8 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   _navigateToNextPage() async {
-    final sharedPreferencesService = AuthService();
-    final isLoggedIn = await sharedPreferencesService.getLoginStatus();
+    final _authService = AuthService();
+    final isLoggedIn = await _authService.isLoggedIn();
 
     await Future.delayed(Duration(seconds: 1));
     if (isLoggedIn) {

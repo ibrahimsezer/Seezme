@@ -11,14 +11,12 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  late Future<String?> getUser;
-  late Future<String?> getEmail;
+  Future<String> getUser = AuthService().getUsername();
+  Future<String> getEmail = AuthService().getEmail();
 
   @override
   void initState() {
     super.initState();
-    getUser = AuthService().getUsername();
-    getEmail = AuthService().getEmail();
   }
 
   @override

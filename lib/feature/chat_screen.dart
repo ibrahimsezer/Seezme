@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:seezme/core/models/chat_model.dart';
 import 'package:seezme/core/providers/navigaton_provider.dart';
-import 'package:seezme/core/providers/theme_provider.dart';
 import 'package:seezme/core/services/auth_service.dart';
 import 'package:seezme/core/utility/constans/constants.dart';
 import 'package:seezme/core/utility/helper_function.dart';
@@ -29,23 +28,17 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
   final ScrollController _scrollController = ScrollController();
 
   List<Widget> _drawerItems = [];
-  Future<String?> _username = AuthService().getUsername();
-  Future<String?> _email = AuthService().getEmail();
 
   //new
   ChatViewModel _chatViewModel = ChatViewModel();
   UserViewModel _userViewModel = UserViewModel();
-
+  AuthService _authService = AuthService();
   @override
   void initState() {
     super.initState();
-    _chatViewModel.fetchMessages();
-    log("fetching messages");
-    _userViewModel.fetchUsers();
-    log("fetching users");
+    Provider.of<ChatViewModel>(context, listen: false).fetchMessages();
+    Provider.of<UserViewModel>(context, listen: false).fetchUsers();
     scrollToBottom(_scrollController);
-    log("scrolling to bottom");
-    _controller.addListener(_handleKeyPress);
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       scrollToBottom(_scrollController);
@@ -55,23 +48,11 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      _chatViewModel.fetchMessages();
-      _userViewModel.fetchUsers();
+      Provider.of<ChatViewModel>(context, listen: false).fetchMessages();
+      Provider.of<UserViewModel>(context, listen: false).fetchUsers();
       WidgetsBinding.instance.addPostFrameCallback((_) {
         scrollToBottom(_scrollController);
       });
-    }
-  }
-
-  void _handleKeyPress() {
-    if (_controller.text.isNotEmpty && _controller.text.endsWith('\n')) {
-      _controller.text = _controller.text.trim();
-      _chatViewModel.sendMessage(ChatModel(
-        sender: FirebaseAuth.instance.currentUser?.email ?? "Unknown",
-        message: _controller.text,
-        type: 'text',
-        createdAt: Timestamp.now(),
-      ));
     }
   }
 
@@ -118,8 +99,6 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    final chatVM = Provider.of<ChatViewModel>(context, listen: false);
-    final userVM = Provider.of<UserViewModel>(context, listen: false);
     double sizeWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
@@ -188,7 +167,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 FutureBuilder<String?>(
-                                  future: _username,
+                                  future: _authService.getUsername(),
                                   builder: (context, snapshot) {
                                     if (snapshot.connectionState ==
                                         ConnectionState.waiting) {
@@ -209,92 +188,63 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                                     }
                                   },
                                 ),
+                                //todo fix this 1
                                 Consumer<UserViewModel>(
-                                    builder: (context, statusProvider, child) {
-                                  final authUser =
-                                      FirebaseAuth.instance.currentUser;
-                                  if (authUser != null) {
-                                    final userDocRef = FirebaseFirestore
-                                        .instance
-                                        .collection('users')
-                                        .doc(authUser.email)
-                                        .toString();
-                                    final userEmail = userDocRef
-                                        .split('/')
-                                        .last
-                                        .replaceAll(')', '');
+                                  builder: (context, value, child) {
                                     return Text(
-                                      _userViewModel.users.map((e) {
-                                        if (e.email == userEmail) {
-                                          return e.status;
-                                        }
-                                      }).toString(),
-                                      style: TextStyle(
-                                          color: _userViewModel.users.map((e) {
-                                                    if (e.email == userEmail) {
-                                                      return e.status;
-                                                    }
-                                                  }) ==
-                                                  Status.statusAvailable
-                                              ? Colors.green
-                                              : _userViewModel.users.map((e) {
-                                                        if (e.email ==
-                                                            userEmail) {
-                                                          return e.status;
-                                                        }
-                                                      }) ==
-                                                      Status.statusIdle
-                                                  ? Colors.orange
-                                                  : _userViewModel.users
-                                                              .map((e) {
-                                                            if (e.email ==
-                                                                userEmail) {
-                                                              return e.status;
-                                                            }
-                                                          }) ==
-                                                          Status.statusBusy
-                                                      ? Colors.red
-                                                      : Colors.grey),
+                                      value.status,
                                     );
-                                  } else {
-                                    return Text(
-                                        'No user is currently signed in.');
-                                  }
-                                }),
+                                  },
+                                )
                               ],
                             ),
-                            PopupMenuButton<String>(
-                              iconSize: 30,
-                              icon: Icon(Icons.arrow_drop_down),
-                              onSelected: (String value) {
-                                final user =
-                                    FirebaseAuth.instance.currentUser!.uid;
-                                _userViewModel.updateUserStatus(user, value);
-                              },
-                              itemBuilder: (BuildContext context) {
-                                return [
-                                  PopupMenuItem<String>(
-                                    value: Status.statusAvailable,
-                                    child: Text(
-                                      Status.statusAvailable,
-                                      style: TextStyle(color: Colors.green),
-                                    ),
-                                  ),
-                                  PopupMenuItem<String>(
-                                    value: Status.statusIdle,
-                                    child: Text(
-                                      Status.statusIdle,
-                                      style: TextStyle(color: Colors.orange),
-                                    ),
-                                  ),
-                                  PopupMenuItem<String>(
-                                    value: Status.statusBusy,
-                                    child: Text(
-                                      Status.statusBusy,
-                                      style: TextStyle(color: Colors.red),
-                                    ),
-                                  ),
-                                ];
+                            Consumer<UserViewModel>(
+                              builder: (context, value, child) {
+                                return PopupMenuButton<String>(
+                                  iconSize: 30,
+                                  icon: Icon(Icons.arrow_drop_down),
+                                  onSelected: (String value) async {
+                                    //todo fix this 2
+                                    String uid = FirebaseAuth
+                                            .instance.currentUser?.uid ??
+                                        "";
+                                    if (uid != "") {
+                                      await Provider.of<UserViewModel>(context,
+                                              listen: false)
+                                          .updateUserStatus(uid, value);
+                                    } else {
+                                      showErrorSnackbar(
+                                          "Check your internet connection",
+                                          context);
+                                    }
+                                  },
+                                  itemBuilder: (BuildContext context) {
+                                    return [
+                                      PopupMenuItem<String>(
+                                        value: Status.statusAvailable,
+                                        child: Text(
+                                          Status.statusAvailable,
+                                          style: TextStyle(color: Colors.green),
+                                        ),
+                                      ),
+                                      PopupMenuItem<String>(
+                                        value: Status.statusIdle,
+                                        child: Text(
+                                          Status.statusIdle,
+                                          style:
+                                              TextStyle(color: Colors.orange),
+                                        ),
+                                      ),
+                                      PopupMenuItem<String>(
+                                        value: Status.statusBusy,
+                                        child: Text(
+                                          Status.statusBusy,
+                                          style: TextStyle(color: Colors.red),
+                                        ),
+                                      ),
+                                    ];
+                                  },
+                                );
                               },
                             ),
                           ],
@@ -332,53 +282,57 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                     },
                   );
                 }),
-            ListTile(
-              leading: const Icon(Icons.people),
-              title: const Text('Active Users'),
-              onTap: () async {
-                _userViewModel.fetchUsers();
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: const Text('Active Users'),
-                      content: SizedBox(
-                        width: double.maxFinite,
-                        child: ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: _userViewModel.users.length,
-                          itemBuilder: (context, index) {
-                            final user = _userViewModel.users[index];
-                            return ListTile(
-                              title: Text(user.username),
-                              subtitle: Text(user.status),
-                              leading: Icon(
-                                Icons.circle,
-                                color: user.status == Status.statusAvailable
-                                    ? Colors.green
-                                    : user.status == Status.statusIdle
-                                        ? Colors.orange
-                                        : user.status == Status.statusBusy
-                                            ? Colors.red
-                                            : Colors.grey,
-                              ),
-                            );
-                          },
+            Consumer<UserViewModel>(builder: (context, userViewModel, child) {
+              return ListTile(
+                leading: const Icon(Icons.people),
+                title: const Text(Titles.activeUsers),
+                onTap: () async {
+                  //todo fix this
+                  Provider.of<UserViewModel>(context, listen: false)
+                      .fetchUsers();
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: const Text(Titles.activeUsers),
+                        content: SizedBox(
+                          width: double.maxFinite,
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: _userViewModel.users.length,
+                            itemBuilder: (context, index) {
+                              final user = _userViewModel.users[index];
+                              return ListTile(
+                                title: Text(user.username),
+                                subtitle: Text(user.status),
+                                leading: Icon(
+                                  Icons.circle,
+                                  color: user.status == Status.statusAvailable
+                                      ? Colors.green
+                                      : user.status == Status.statusIdle
+                                          ? Colors.orange
+                                          : user.status == Status.statusBusy
+                                              ? Colors.red
+                                              : Colors.grey,
+                                ),
+                              );
+                            },
+                          ),
                         ),
-                      ),
-                      actions: <Widget>[
-                        TextButton(
-                          child: const Text('Close'),
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                        ),
-                      ],
-                    );
-                  },
-                );
-              },
-            ),
+                        actions: <Widget>[
+                          TextButton(
+                            child: const Text('Close'),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                },
+              );
+            }),
             ..._drawerItems,
           ],
         ),
@@ -392,9 +346,10 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                 return ListView.builder(
                   controller: _scrollController,
                   reverse: false,
-                  itemCount: _chatViewModel.messages.length,
+                  itemCount: context.read<ChatViewModel>().messages.length,
                   itemBuilder: (context, index) {
-                    final message = _chatViewModel.messages[index];
+                    final message =
+                        context.read<ChatViewModel>().messages[index];
                     if (message.type == 'text') {
                       return MessageWidget(
                         message: message.message,
@@ -462,16 +417,16 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                         },
                       ),
                     ),
-                    onSubmitted: (value) {
-                      _chatViewModel.sendMessage(
-                        ChatModel(
-                          sender: FirebaseAuth.instance.currentUser?.email ??
-                              "Unknown",
-                          message: _controller.text,
-                          type: 'text',
-                          createdAt: Timestamp.now(),
-                        ),
-                      );
+                    onSubmitted: (value) async {
+                      context.read<ChatViewModel>().sendMessage(
+                            ChatModel(
+                              sender:
+                                  await _authService.getUsername().toString(),
+                              message: _controller.text,
+                              type: 'text',
+                              createdAt: Timestamp.now(),
+                            ),
+                          );
                       _controller.clear();
                     },
                   ),
@@ -483,16 +438,16 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                   ),
                   child: IconButton(
                       icon: const Icon(Icons.send, color: Colors.white),
-                      onPressed: () {
-                        _chatViewModel.sendMessage(
-                          ChatModel(
-                            sender: FirebaseAuth.instance.currentUser?.email ??
-                                "Unknown",
-                            message: _controller.text,
-                            type: 'text',
-                            createdAt: Timestamp.now(),
-                          ),
-                        );
+                      onPressed: () async {
+                        context.read<ChatViewModel>().sendMessage(
+                              ChatModel(
+                                sender:
+                                    await _authService.getUsername().toString(),
+                                message: _controller.text,
+                                type: 'text',
+                                createdAt: Timestamp.now(),
+                              ),
+                            );
                         _controller.clear();
                       }),
                 ),

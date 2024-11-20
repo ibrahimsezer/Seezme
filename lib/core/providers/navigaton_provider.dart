@@ -11,12 +11,7 @@ class NavigationProvider with ChangeNotifier {
   get goTargetPage => _goTargetPage;
 
   Future<void> _logoutAndGoToLoginPage(BuildContext context) async {
-    // Firebase Authentication'dan çıkış yap
-    await FirebaseAuth.instance.signOut();
-
-    // SharedPreferences'dan kullanıcı bilgilerini temizle
-    final _auth = AuthService();
-    await _auth.clearUserData();
+    AuthService().signOut();
 
     Navigator.pushAndRemoveUntil(
       context,

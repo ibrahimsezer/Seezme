@@ -9,3 +9,11 @@ void scrollToBottom(ScrollController _scrollController) {
     );
   }
 }
+
+void showErrorSnackbar(String message, BuildContext context) {
+  final snackBar = SnackBar(
+    content: Text(message),
+    duration: const Duration(seconds: 3),
+  );
+  ScaffoldMessenger.of(context).showSnackBar(snackBar);
+}

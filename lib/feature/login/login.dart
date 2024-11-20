@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:seezme/core/providers/navigaton_provider.dart';
 import 'package:seezme/core/services/auth_service.dart';
 import 'package:seezme/core/utility/constans/constants.dart';
+import 'package:seezme/core/utility/helper_function.dart';
 import 'package:seezme/widgets/authentication_button_widget.dart';
 import 'package:seezme/widgets/custom_textfield_widget.dart';
 
@@ -44,21 +45,17 @@ class _LoginPageState extends State<LoginPage> {
         final userDoc = usernameQuerySnapshot.docs.isNotEmpty
             ? usernameQuerySnapshot.docs.first
             : emailQuerySnapshot.docs.first;
-        final username = userDoc['username'];
         final email = userDoc['email'];
 
         // Save login status and username
-        await _auth.saveLoginStatus(true);
-        await _auth.setUsername(username);
-        await _auth.setEmail(email);
-
+        await _auth.signIn(email, password);
         // Navigate to chat screen
         Navigator.pushReplacementNamed(context, Routes.chatScreen);
       } else {
-        _showErrorSnackbar('Invalid username/email or password');
+        showErrorSnackbar('Invalid username/email or password', context);
       }
     } catch (e) {
-      _showErrorSnackbar('Failed to login. Please try again.');
+      showErrorSnackbar('Failed to login. Please try again.', context);
       print(e);
     }
   }
@@ -70,18 +67,6 @@ class _LoginPageState extends State<LoginPage> {
     _usernameController.dispose();
     _passwordController.dispose();
     super.dispose();
-  }
-
-  void _showErrorSnackbar(String message) {
-    final snackBar = SnackBar(
-      backgroundColor: Colors.transparent,
-      content: Text(
-        message,
-        style: errorTextStyle,
-      ),
-      duration: const Duration(seconds: 3),
-    );
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   @override

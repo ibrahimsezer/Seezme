@@ -26,6 +26,7 @@ class Titles {
   static const String notifications = "Notifications";
   static const String privacy = "Privacy";
   static const String theme = "Theme";
+  static const String activeUsers = "Active Users";
 }
 
 class Assets {
@@ -40,6 +41,7 @@ class Status {
   static const String statusAvailable = 'Available';
   static const String statusIdle = 'Idle';
   static const String statusBusy = 'Busy';
+  static const String statusOffline = 'Offline';
 }
 
 class LoginType {
