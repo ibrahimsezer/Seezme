@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:seezme/core/providers/navigaton_provider.dart';
 import 'package:seezme/core/providers/notifications_provider.dart';
@@ -20,6 +21,7 @@ import 'package:seezme/feature/settings/theme_settings.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
 
   runApp(
     MultiProvider(
@@ -41,25 +43,24 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: MaterialApp(
-        title: Titles.mainTitle,
-        theme: defaultTheme, // todo rework theme
-        darkTheme: ThemeData.dark(),
-        themeMode: Provider.of<ThemeProvider>(context).currentTheme,
-        initialRoute: initialRoute,
-        routes: {
-          Routes.register: (context) => const RegisterPage(),
-          Routes.login: (context) => const LoginPage(),
-          Routes.profile: (context) => const ProfileScreen(),
-          Routes.chatScreen: (context) => const ChatScreen(),
-          Routes.webrtc: (context) => VideoCallScreen(),
-          Routes.notifications: (context) => NotificationsPage(),
-          Routes.theme: (context) => ThemeSettingsPage(),
-          Routes.privacy: (context) => PrivacyPage(),
-          Routes.splashScreen: (context) => SplashScreen(),
-        },
-      ),
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: Titles.mainTitle,
+      theme: defaultTheme, // todo rework theme
+      darkTheme: ThemeData.dark(),
+      themeMode: Provider.of<ThemeProvider>(context).currentTheme,
+      initialRoute: initialRoute,
+      routes: {
+        Routes.register: (context) => const RegisterPage(),
+        Routes.login: (context) => const LoginPage(),
+        Routes.profile: (context) => const ProfileScreen(),
+        Routes.chatScreen: (context) => const ChatScreen(),
+        Routes.webrtc: (context) => VideoCallScreen(),
+        Routes.notifications: (context) => NotificationsPage(),
+        Routes.theme: (context) => ThemeSettingsPage(),
+        Routes.privacy: (context) => PrivacyPage(),
+        Routes.splashScreen: (context) => SplashScreen(),
+      },
     );
   }
 }

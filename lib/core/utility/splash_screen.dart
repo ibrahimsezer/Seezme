@@ -31,7 +31,7 @@ class _SplashScreenState extends State<SplashScreen> {
             .updateStatus(status!);
       });
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const ChatScreen()),
+        MaterialPageRoute(builder: (context) => ChatScreen()),
       );
     } else {
       Navigator.of(context).pushReplacement(

@@ -30,11 +30,12 @@ class Titles {
 }
 
 class Assets {
-  static const String logoTransparent = 'lib/assets/logotransparent2.png';
-  static const String logoSquare = 'lib/assets/logosquare.jpeg';
+  static const String logoTransparent =
+      'lib/assets/appimage/logotransparent2.png';
+  static const String logoSquare = 'lib/assets/appimage/logosquare.jpeg';
   static const String profileImage =
-      'lib/assets/default_user_profile_photo.jpeg';
-  static const String logo_9_16 = "lib/assets/logo.jpg";
+      'lib/assets/appimage/default_user_profile_photo.jpeg';
+  static const String logo_9_16 = "lib/assets/appimage/logo.jpg";
 }
 
 class Status {
@@ -45,21 +46,62 @@ class Status {
 }
 
 class LoginType {
-  static const String google = 'Login with Google';
-  static const String email = 'Login with Email';
+  static const String google = 'Sign In with Google';
+  static const String email = 'Sign In';
 }
 
 class RegisterType {
-  static const String google = 'Register with Google';
-  static const String email = 'Register with Email';
+  static const String google = 'Sign Up With Google';
+  static const String email = 'Sign Up';
+}
+
+class FontSize {
+  static const double dateFontSize = 10.0;
+  static const double usernameFontSize = 16.0;
+  static const double textFontSize = 16.0;
+  static const double buttonTextFontSize = 16.0;
+  static const double statusFontSize = 12.0;
+  static const double emailFontSize = 12.0;
+  static const double titleFontSize = 12.0;
+  static const double bigTitleFontSize = 24.0;
+}
+
+class PaddingSize {
+  static const EdgeInsets paddingLargeSize = EdgeInsets.all(32);
+  static const EdgeInsets paddingMediumSize = EdgeInsets.all(24);
+  static const EdgeInsets paddingStandartSize = EdgeInsets.all(16);
+  static const EdgeInsets paddingSmallSize = EdgeInsets.all(8);
+}
+
+class ConstColors {
+  static const Color primaryColor = Color(0xFF1B1311);
+  static const Color secondaryColor = Color(0xFFFEAE03);
+  static const Color surfaceColor = Color(0xFF1B1311);
+  static const Color errorColor = Color(0xFFFFFFFF);
+  static const Color onPrimaryColor = Color(0xFFFFFFFF);
+  static const Color onSecondaryColor = Color(0xFF1B1311);
+  static const Color onSurfaceColor = Color(0xFFFFFFFF);
+  static const Color onErrorColor = Color(0xFFFF3300);
+
+  static const Color foregroundColor = Color(0xFF1B1311);
+  static const Color backgroundColor = Color(0xFFFEAE03);
+  static const Color fontColor = Color(0xFF1B1311);
+
+  static const Color dateColor = Color(0xFF1B1311);
+
+  static const Color whiteColor = Color(0xFFFFFFFF);
+  static const Color greyColor = Color(0xFF9E9E9E);
+  static const Color blueDodger = Color(0xFF078BFE);
+  static const Color redImperial = Color(0xFFFC333C);
+  static const Color orangeWeb = Color(0xFFFEAE03);
+  static const Color blackLicorice = Color(0xFF1B1311);
+  static const Color blackLicoriceDark = Color(0xFF191210);
 }
 
 String defaultFontFamily = "Roboto";
-Color defaultLightColor = const Color(0xFF485460);
-Color defaultTextBackgroundColor = const Color(0xFF485460);
-Color defaultButtonColorDark = const Color(0xFF485460);
-Color defaultButtonColorLight = const Color(0xFFFFFFFF);
-Color defaultButtonBorderColorDark = const Color(0xFF485460);
+Color defaultTextBackgroundColor = const Color(0xFFFEAE03);
+Color defaultButtonColorDark = const Color(0xFFFEAE03);
+Color defaultButtonBorderColorDark = const Color(0xFFFEAE03);
 TextStyle errorTextStyle = TextStyle(
   fontFamily: defaultFontFamily,
   color: Colors.red,
@@ -69,32 +111,35 @@ TextStyle errorTextStyle = TextStyle(
 
 ThemeData defaultTheme = ThemeData(
   colorScheme: const ColorScheme(
-    primary: Color(0xFF1e272e), // Ana renk
-    secondary: Color(0xFF485460), // İkincil renk
-    surface: Color(0xFF1e272e), // Yüzey rengi
-    error: Color(0xFF252128), // Hata rengi
-    onPrimary: Color(0xFFFFFFFF), // Ana renk üzerindeki yazı rengi
-    onSecondary: Color(0xFFFFFFFF), // İkincil renk üzerindeki yazı rengi
-    onSurface: Color(0xFFFFFFFF), // Yüzey rengi üzerindeki yazı rengi
-    onError: Color(0xFFFFFFFF), // Hata rengi üzerindeki yazı rengi
+    primary: ConstColors.primaryColor, // Ana renk
+    secondary: ConstColors.secondaryColor, // İkincil renk
+    surface: ConstColors.surfaceColor, // Yüzey rengi
+    error: ConstColors.errorColor, // Hata rengi
+    onPrimary: ConstColors.onPrimaryColor, // Ana renk üzerindeki yazı rengi
+    onSecondary:
+        ConstColors.onSecondaryColor, // İkincil renk üzerindeki yazı rengi
+    onSurface: ConstColors.onSurfaceColor, // Yüzey rengi üzerindeki yazı rengi
+    onError: ConstColors.onErrorColor, // Hata rengi üzerindeki yazı rengi
     brightness: Brightness.dark, // Tema parlaklığı
   ),
-  primaryColor: const Color(0xFF1e272e), // Ana renk
+  primaryColor: ConstColors.primaryColor, // Ana renk
   textButtonTheme: TextButtonThemeData(
     style: ButtonStyle(
+      foregroundColor:
+          WidgetStateProperty.all<Color>(ConstColors.foregroundColor),
       backgroundColor: WidgetStateProperty.all<Color>(
-          const Color(0xFF485460)), // Buton arka plan rengi
+          ConstColors.backgroundColor), // Buton arka plan rengi
     ),
   ),
   textTheme: TextTheme(
     bodyLarge: TextStyle(
         fontFamily: defaultFontFamily,
-        color: Color(0xFFFFFFFF)), // Büyük metin rengi
+        color: ConstColors.fontColor), // Büyük metin rengi
     bodyMedium: TextStyle(
         fontFamily: defaultFontFamily,
-        color: Color(0xFFFFFFFF)), // Orta metin rengi
+        color: ConstColors.fontColor), // Orta metin rengi
     displayLarge: TextStyle(
         fontFamily: defaultFontFamily,
-        color: Color(0xFFFFFFFF)), // Büyük başlık rengi
+        color: ConstColors.fontColor), // Büyük başlık rengi
   ),
 );

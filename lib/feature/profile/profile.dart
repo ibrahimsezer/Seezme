@@ -47,9 +47,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     return Text(
                       snapshot.data ?? '--',
                       style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
+                          fontSize: FontSize.usernameFontSize,
+                          fontWeight: FontWeight.bold,
+                          color: ConstColors.onPrimaryColor),
                     );
                   }
                 },
@@ -66,8 +66,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     return Text(
                       snapshot.data ?? '--',
                       style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.grey,
+                        fontSize: FontSize.emailFontSize,
+                        color: ConstColors.greyColor,
                       ),
                     );
                   }

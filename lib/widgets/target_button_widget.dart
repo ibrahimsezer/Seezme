@@ -36,8 +36,7 @@ class TargetButtonWidget extends StatelessWidget {
           decoration: BoxDecoration(
               color: defaultButtonColorDark,
               borderRadius: BorderRadius.circular(10),
-              border:
-                  Border.all(width: 1, color: defaultButtonBorderColorDark)),
+              border: Border.all(width: 1, color: ConstColors.orangeWeb)),
           child: Padding(
             padding: const EdgeInsets.all(18),
             child: Row(
@@ -46,20 +45,23 @@ class TargetButtonWidget extends StatelessWidget {
                 Icon(
                   icon,
                   color: icon == Icons.exit_to_app_outlined
-                      ? Colors.red
-                      : Colors.white,
+                      ? ConstColors.redImperial
+                      : ConstColors.blackLicorice,
                 ),
                 Padding(
                   padding: const EdgeInsets.only(left: 8.0),
                   child: Text(title,
                       style: TextStyle(
                         color: icon == Icons.exit_to_app_outlined
-                            ? Colors.red
-                            : Colors.white,
+                            ? ConstColors.redImperial
+                            : ConstColors.blackLicorice,
                       )),
                 ),
                 Spacer(),
-                Icon(Icons.arrow_forward_ios_outlined),
+                Icon(
+                  Icons.arrow_forward_ios_outlined,
+                  color: ConstColors.blackLicorice,
+                ),
               ],
             ),
           ),

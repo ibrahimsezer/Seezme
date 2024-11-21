@@ -77,7 +77,9 @@ class MessageWidget extends StatelessWidget {
                 const SizedBox(width: 10),
                 Text(
                   sender, // Kullanıcı adı
-                  style: const TextStyle(color: Colors.white70),
+                  style: const TextStyle(
+                      color: ConstColors.fontColor,
+                      fontSize: FontSize.usernameFontSize),
                 ),
               ],
             ),
@@ -89,7 +91,9 @@ class MessageWidget extends StatelessWidget {
                     alignment: Alignment.centerLeft,
                     child: Text(
                       message,
-                      style: const TextStyle(color: Colors.white70),
+                      style: const TextStyle(
+                          color: ConstColors.fontColor,
+                          fontSize: FontSize.textFontSize),
                       maxLines: null,
                       overflow: TextOverflow.visible,
                     ),
@@ -99,7 +103,9 @@ class MessageWidget extends StatelessWidget {
                   alignment: Alignment.centerRight,
                   child: Text(
                     createdAt.toDate().toString().substring(0, 19),
-                    style: const TextStyle(color: Colors.white54, fontSize: 10),
+                    style: const TextStyle(
+                        color: ConstColors.dateColor,
+                        fontSize: FontSize.dateFontSize),
                   ),
                 ),
               ],

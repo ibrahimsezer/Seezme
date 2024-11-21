@@ -100,6 +100,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
     double sizeWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title:
             const Text(Titles.mainTitle, style: TextStyle(color: Colors.white)),
         backgroundColor: defaultTheme.primaryColor,
@@ -135,15 +136,6 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Align(
-                      alignment: Alignment.center,
-                      child: Container(
-                        height: sizeWidth * 0.15,
-                        child: Image(
-                          image: AssetImage(Assets.logoTransparent),
-                        ),
-                      ),
-                    ),
                     Row(
                       mainAxisSize: MainAxisSize.max,
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -156,7 +148,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                                 .goTargetPage(context, Routes.profile);
                           },
                           child: Padding(
-                              padding: EdgeInsets.all(15),
+                              padding: PaddingSize.paddingStandartSize,
                               child: AvatarWidget()),
                         ),
                         Row(
@@ -177,7 +169,8 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                                         maxLines: 1,
                                         snapshot.data ?? '--',
                                         style: TextStyle(
-                                          fontSize: 18,
+                                          color: ConstColors.onPrimaryColor,
+                                          fontSize: FontSize.usernameFontSize,
                                           fontWeight: FontWeight.bold,
                                           overflow: TextOverflow.ellipsis,
                                         ),
@@ -188,9 +181,11 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                                 ),
                                 Consumer<UserViewModel>(
                                   builder: (context, value, child) {
-                                    return Text(
-                                      value.status,
-                                    );
+                                    return Text(value.status,
+                                        style: TextStyle(
+                                          color: ConstColors.onPrimaryColor,
+                                          fontSize: FontSize.statusFontSize,
+                                        ));
                                   },
                                 )
                               ],
@@ -220,29 +215,40 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                                         value: Status.statusAvailable,
                                         child: Text(
                                           Status.statusAvailable,
-                                          style: TextStyle(color: Colors.green),
+                                          style: TextStyle(
+                                              color: Colors.green,
+                                              fontSize:
+                                                  FontSize.statusFontSize),
                                         ),
                                       ),
                                       PopupMenuItem<String>(
                                         value: Status.statusIdle,
                                         child: Text(
                                           Status.statusIdle,
-                                          style:
-                                              TextStyle(color: Colors.orange),
+                                          style: TextStyle(
+                                              color: Colors.orange,
+                                              fontSize:
+                                                  FontSize.statusFontSize),
                                         ),
                                       ),
                                       PopupMenuItem<String>(
                                         value: Status.statusBusy,
                                         child: Text(
                                           Status.statusBusy,
-                                          style: TextStyle(color: Colors.red),
+                                          style: TextStyle(
+                                              color: Colors.red,
+                                              fontSize:
+                                                  FontSize.statusFontSize),
                                         ),
                                       ),
                                       PopupMenuItem<String>(
                                         value: Status.statusOffline,
                                         child: Text(
                                           Status.statusOffline,
-                                          style: TextStyle(color: Colors.grey),
+                                          style: TextStyle(
+                                              color: Colors.grey,
+                                              fontSize:
+                                                  FontSize.statusFontSize),
                                         ),
                                       ),
                                     ];
@@ -380,64 +386,67 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: PaddingSize.paddingSmallSize,
             child: Row(
               children: [
                 Expanded(
                   child: TextField(
-                    controller: _controller,
-                    cursorColor: defaultTheme.primaryColor,
-                    style: TextStyle(
-                      color: defaultTheme.primaryColor,
-                    ),
-                    decoration: InputDecoration(
-                      hintText: 'Send a message...',
-                      hintStyle: TextStyle(color: Colors.grey[600]),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30.0),
-                        borderSide: BorderSide.none,
+                      controller: _controller,
+                      cursorColor: defaultTheme.primaryColor,
+                      style: TextStyle(
+                        color: defaultTheme.primaryColor,
                       ),
-                      filled: true,
-                      fillColor: Colors.grey[200],
-                      contentPadding: const EdgeInsets.symmetric(
-                          vertical: 10.0, horizontal: 20.0),
-                      prefixIcon: IconButton(
-                        icon: Icon(Icons.add, color: Colors.grey[600]),
-                        onPressed: () {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                title: Text('Info'),
-                                content:
-                                    Text('Image send is not available yet'),
-                                actions: <Widget>[
-                                  TextButton(
-                                    child: Text('OK'),
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                  ),
-                                ],
+                      decoration: InputDecoration(
+                        hintText: 'Send a message...',
+                        hintStyle: TextStyle(color: ConstColors.greyColor),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30.0),
+                          borderSide: BorderSide.none,
+                        ),
+                        filled: true,
+                        fillColor: ConstColors.whiteColor,
+                        contentPadding: const EdgeInsets.symmetric(
+                            vertical: 10.0, horizontal: 20.0),
+                        prefixIcon: IconButton(
+                          icon: Icon(Icons.add, color: ConstColors.greyColor),
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text('Info'),
+                                  content:
+                                      Text('Image send is not available yet'),
+                                  actions: <Widget>[
+                                    TextButton(
+                                      child: Text('OK'),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                      onSubmitted: (value) async {
+                        if (_controller.text != "") {
+                          await context.read<ChatViewModel>().sendMessage(
+                                ChatModel(
+                                  sender: await _authService.getUsername(),
+                                  message: _controller.text,
+                                  type: 'text',
+                                  createdAt: Timestamp.now(),
+                                ),
                               );
-                            },
-                          );
-                        },
-                      ),
-                    ),
-                    onSubmitted: (value) async {
-                      await context.read<ChatViewModel>().sendMessage(
-                            ChatModel(
-                              sender: await _authService.getUsername(),
-                              message: _controller.text,
-                              type: 'text',
-                              createdAt: Timestamp.now(),
-                            ),
-                          );
-                      _controller.clear();
-                      scrollToBottom(_scrollController, context);
-                    },
-                  ),
+                          _controller.clear();
+                          scrollToBottom(_scrollController, context);
+                        } else {
+                          return null;
+                        }
+                      }),
                 ),
                 const SizedBox(width: 8),
                 Container(
@@ -447,16 +456,21 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                   child: IconButton(
                       icon: const Icon(Icons.send, color: Colors.white),
                       onPressed: () async {
-                        await context.read<ChatViewModel>().sendMessage(
-                              ChatModel(
-                                sender: await _authService.getUsername(),
-                                message: _controller.text,
-                                type: 'text',
-                                createdAt: Timestamp.now(),
-                              ),
-                            );
-                        _controller.clear();
-                        scrollToBottom(_scrollController, context);
+                        if (_controller.text != "") {
+                          //todo if message is empty don't send message
+                          await context.read<ChatViewModel>().sendMessage(
+                                ChatModel(
+                                  sender: await _authService.getUsername(),
+                                  message: _controller.text,
+                                  type: 'text',
+                                  createdAt: Timestamp.now(),
+                                ),
+                              );
+                          _controller.clear();
+                          scrollToBottom(_scrollController, context);
+                        } else {
+                          return null;
+                        }
                       }),
                 ),
               ],

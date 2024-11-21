@@ -88,23 +88,31 @@ class _RegisterPageState extends State<RegisterPage> {
       body: Center(
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: PaddingSize.paddingStandartSize,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Image(
-                  height: 200,
                   width: 200,
                   image: AssetImage(Assets.logoTransparent),
-                  fit: BoxFit.contain,
+                  fit: BoxFit.fitWidth,
                 ),
+                SizedBox(height: 64),
+                Text("Sign Up",
+                    style: TextStyle(
+                      color: ConstColors.orangeWeb,
+                      fontSize: FontSize.bigTitleFontSize,
+                    )),
+                SizedBox(height: 16),
                 CustomTextField(
+                  title: "Email",
                   controller: _emailController,
                   icon: Icons.email,
                   hintText: 'Enter Your Email',
                 ),
                 const SizedBox(height: 16.0),
                 CustomTextField(
+                  title: "Password",
                   controller: _passwordController,
                   obscureText: true,
                   icon: Icons.lock,
@@ -112,6 +120,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
                 const SizedBox(height: 16.0),
                 CustomTextField(
+                  title: "Retry Password",
                   controller: _passwordRetryController,
                   icon: Icons.lock,
                   obscureText: true,
@@ -130,7 +139,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   child: const Text(
                     'Do you have an account? Login here',
                     style: TextStyle(
-                      color: Colors.blue,
+                      color: ConstColors.orangeWeb,
                       decoration: TextDecoration.none,
                     ),
                   ),

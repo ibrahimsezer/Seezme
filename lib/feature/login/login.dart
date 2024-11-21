@@ -77,23 +77,32 @@ class _LoginPageState extends State<LoginPage> {
       body: Center(
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: PaddingSize.paddingStandartSize,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Image(
-                  height: 200,
                   width: 200,
                   image: AssetImage(Assets.logoTransparent),
-                  fit: BoxFit.contain,
+                  fit: BoxFit.fitWidth,
                 ),
+                SizedBox(height: 64),
+                Text("Sign In",
+                    style: TextStyle(
+                      color: ConstColors.orangeWeb,
+                      fontSize: FontSize.bigTitleFontSize,
+                    )),
+                SizedBox(height: 16),
+
                 CustomTextField(
+                  title: "Email or Username",
                   controller: _usernameController,
                   icon: Icons.person,
                   hintText: 'Username or Email',
                 ),
                 const SizedBox(height: 16.0),
                 CustomTextField(
+                  title: "Password",
                   icon: Icons.lock,
                   controller: _passwordController,
                   obscureText: true,
@@ -119,7 +128,7 @@ class _LoginPageState extends State<LoginPage> {
                   child: const Text(
                     'Don\'t have an account? Register here',
                     style: TextStyle(
-                      color: Colors.blue,
+                      color: ConstColors.orangeWeb,
                       decoration: TextDecoration.none,
                     ),
                   ),

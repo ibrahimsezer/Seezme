@@ -28,7 +28,8 @@ class UserViewModel with ChangeNotifier {
 
   //get user from firestore
   Future<void> fetchUsers() async {
-    final snapshot = await _firestore.collection('users').get();
+    final snapshot =
+        await _firestore.collection('users').orderBy('username').get();
     _users = snapshot.docs
         .map((doc) => UserModel.fromFirestore(doc.data()))
         .toList();
