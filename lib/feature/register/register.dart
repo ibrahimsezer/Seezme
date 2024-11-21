@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:seezme/core/providers/navigaton_provider.dart';
@@ -19,8 +20,9 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _passwordRetryController =
       TextEditingController();
-  final AuthService _authService = AuthService();
 
+  FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final AuthService _authService = AuthService();
   Future<void> _registerWithEmail() async {
     if (_emailController.text.isEmpty ||
         _passwordController.text.isEmpty ||
@@ -40,16 +42,26 @@ class _RegisterPageState extends State<RegisterPage> {
     }
 
     try {
-      _authService.register(_emailController.text, _passwordController.text);
+      final querySnapshot = await _firestore
+          .collection("users")
+          .where("email", isEqualTo: _emailController.text)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        showErrorSnackbar(
+            'Email has already been registered. Please try another email.',
+            context);
+        return;
+      } else {
+        await _authService.register(
+            _emailController.text, _passwordController.text);
+      }
 
       // Navigate to login page
       Provider.of<NavigationProvider>(context, listen: false)
           .goTargetPage(context, Routes.login);
     } catch (e) {
-      showErrorSnackbar(
-          'Sign up with a real email. (Password must be minimum 6 characters)',
-          context);
-      print(e);
+      showErrorSnackbar("An error occurred: $e", context);
     }
   }
 
