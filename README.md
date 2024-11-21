@@ -31,14 +31,17 @@ Seezme is a feature-rich voice and chat messaging application developed in Flutt
 
 <table>
   <tr>
-      <td><img src="lib/assets/logo.jpg" alt="Logo" width="200"/></td>
-      <td><img src="lib/assets/profilepage.jpg" alt="Logo" width="200"/></td>
-      <td><img src="lib/assets/chat.jpg" alt="Chat" width="200"/></td>
+      <td><img src="lib/assets/appimage/logo.jpg" alt="Logo" width="200"/></td>
+      <td><img src="lib/assets/promotional_image/register_page.jpg" alt="Add Item" width="200"/></td>
+      <td><img src="lib/assets/promotional_image/login_page.jpg" alt="Add Item" width="200"/></td>
   </tr>
   <tr>
-      <td><img src="lib/assets/addmedia.jpg" alt="Add Media" width="200"/></td>
-      <td><img src="lib/assets/additem.jpg" alt="Add Item" width="200"/></td>
+      <td><img src="lib/assets/promotional_image/side_bar.jpg" alt="Add Item" width="200"/></td>
+      <td><img src="lib/assets/promotional_image/status_popup.jpg" alt="Add Item" width="200"/></td>
+      <td><img src="lib/assets/promotional_image/chat_screen_page.jpg" alt="Chat" width="200"/></td>
   </tr>
+  <tr><td><img src="lib/assets/promotional_image/addmedia.jpg" alt="Add Media" width="200"/></td>
+      <td><img src="lib/assets/promotional_image/profile_page.jpg" alt="Logo" width="200"/></td></tr>
 </table>
 
 ## Installation
@@ -70,6 +73,95 @@ Seezme uses the [Provider](https://pub.dev/packages/provider) package for state 
 
 - **Providers**: Manage app-wide states, such as user authentication, message list updates, and chat room management.
 - **Consumers**: Widgets that reactively update based on changes in the state, ensuring efficient UI rendering and a smooth user experience.
+
+## Firebase Backend Integration
+
+Seezme leverages **Firebase Firestore** and **Firebase Authentication** to provide a robust backend infrastructure for real-time messaging and secure user authentication. Below is an overview of how Firebase services are integrated into the application.
+
+### **Features**
+
+- **Firebase Authentication**: 
+  - User registration and login.
+  - Secure authentication via email and password.
+  - Easy-to-manage user sessions.
+  
+- **Firebase Firestore**: 
+  - Real-time database for storing user data, chat messages, and status updates.
+  - Scalable and flexible document-based structure.
+  - Real-time updates to ensure instant communication.
+
+---
+
+### **Firebase Setup Guide**
+
+To set up Firebase for the Seezme project, follow these steps:
+
+1. **Create a Firebase Project**:
+   - Go to the [Firebase Console](https://console.firebase.google.com/).
+   - Click on **Add Project** and follow the setup wizard.
+
+2. **Enable Authentication**:
+   - Navigate to **Authentication** > **Sign-in method**.
+   - Enable **Email/Password** authentication.
+
+3. **Setup Firestore**:
+   - Navigate to **Firestore Database** > **Create Database**.
+   - Select **Start in test mode** (or configure rules based on your needs).
+   - Create the following collections:
+     - `users`: Stores user profiles (e.g., email, username, status).
+     - `messages`: Stores chat messages (e.g., sender ID, receiver ID, timestamp, message content).
+
+4. **Download Firebase Config File**:
+   - For Android: Download `google-services.json` and place it in the `android/app` directory.
+   - For iOS: Download `GoogleService-Info.plist` and add it to your iOS project.
+
+5. **Add Dependencies**:
+   Ensure the following dependencies are added to your `pubspec.yaml` file:
+   ```yaml
+   dependencies:
+     firebase_core: ^2.0.0
+     firebase_auth: ^5.0.0
+     cloud_firestore: ^4.0.0
+     provider: ^6.1.0
+   ```
+
+6. **Initialize Firebase**:
+   Add Firebase initialization code in your main file:
+   ```dart
+   import 'package:firebase_core/firebase_core.dart';
+
+   void main() async {
+     WidgetsFlutterBinding.ensureInitialized();
+     await Firebase.initializeApp();
+     runApp(SeezmeApp());
+   }
+   ```
+
+---
+
+### **Firestore Data Structure**
+
+Below is a suggested structure for your Firestore database:
+
+#### **Users Collection**
+| Field       | Type       | Description                     |
+|-------------|------------|---------------------------------|
+| `uid`       | String     | Unique user ID.                |
+| `email`     | String     | User's email address.          |
+| `username`  | String     | User's display name.           |
+| `status`    | String     | Online status (available, busy, offline). |
+| `createdAt` | Timestamp  | Account creation date.         |
+
+#### **Messages Collection**
+| Field       | Type       | Description                     |
+|-------------|------------|---------------------------------|
+| `senderId`  | String     | UID of the message sender.     |
+| `receiverId`| String     | UID of the message receiver.   |
+| `content`   | String     | Message content.               |
+| `timestamp` | Timestamp  | Time the message was sent.     |
+
+---
+
 
 ## Contribution
 
