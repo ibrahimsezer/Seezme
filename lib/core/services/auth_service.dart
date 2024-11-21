@@ -73,10 +73,12 @@ class AuthService {
       final user = _auth.currentUser;
       if (user != null) {
         final userRef = _firestore.collection("users").doc(user.uid);
+        String baseUsername = email.split("@").first;
+        String username = await _generateUniqueUsername(baseUsername);
         await userRef.set({
           "uid": user.uid,
           "email": email,
-          "username": email.split("@").first,
+          "username": username,
           "password": password,
           "status": Status.statusAvailable,
           "createdAt": Timestamp.now(),
@@ -85,5 +87,27 @@ class AuthService {
     } catch (e) {
       throw Exception("Registration failed: $e");
     }
+  }
+
+  Future<String> _generateUniqueUsername(String baseUsername) async {
+    int suffix = 1;
+    String username = "$baseUsername#$suffix";
+    bool isUnique = false;
+
+    while (!isUnique) {
+      final querySnapshot = await _firestore
+          .collection("users")
+          .where("username", isEqualTo: username)
+          .get();
+
+      if (querySnapshot.docs.isEmpty) {
+        isUnique = true;
+      } else {
+        suffix++;
+        username = "$baseUsername#$suffix";
+      }
+    }
+
+    return username;
   }
 }

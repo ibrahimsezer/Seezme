@@ -34,6 +34,11 @@ class _RegisterPageState extends State<RegisterPage> {
       return;
     }
 
+    if (!_isValidEmail(_emailController.text)) {
+      showErrorSnackbar('Invalid email address.', context);
+      return;
+    }
+
     try {
       _authService.register(_emailController.text, _passwordController.text);
 
@@ -47,6 +52,14 @@ class _RegisterPageState extends State<RegisterPage> {
       print(e);
     }
   }
+
+  bool _isValidEmail(String email) {
+    final RegExp emailRegex = RegExp(
+      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+    );
+    return emailRegex.hasMatch(email);
+  }
+
   //todo added register with google
 
   @override

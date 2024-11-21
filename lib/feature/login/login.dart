@@ -53,6 +53,8 @@ class _LoginPageState extends State<LoginPage> {
         Navigator.pushReplacementNamed(context, Routes.chatScreen);
       } else {
         showErrorSnackbar('Invalid username/email or password', context);
+        showErrorSnackbar(
+            'Try this \nUsername : user#1\nEmail: user@mail.com', context);
       }
     } catch (e) {
       showErrorSnackbar('Failed to login. Please try again.', context);
