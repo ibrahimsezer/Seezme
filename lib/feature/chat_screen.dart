@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -30,18 +28,18 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
   List<Widget> _drawerItems = [];
 
   //new
-  ChatViewModel _chatViewModel = ChatViewModel();
-  UserViewModel _userViewModel = UserViewModel();
+  //ChatViewModel _chatViewModel = ChatViewModel();
+  //UserViewModel _userViewModel = UserViewModel();
   AuthService _authService = AuthService();
   @override
   void initState() {
     super.initState();
     Provider.of<ChatViewModel>(context, listen: false).fetchMessages();
     Provider.of<UserViewModel>(context, listen: false).fetchUsers();
-    scrollToBottom(_scrollController);
+    scrollToBottom(_scrollController, context);
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      scrollToBottom(_scrollController);
+      scrollToBottom(_scrollController, context);
     });
   }
 
@@ -51,7 +49,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
       Provider.of<ChatViewModel>(context, listen: false).fetchMessages();
       Provider.of<UserViewModel>(context, listen: false).fetchUsers();
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        scrollToBottom(_scrollController);
+        scrollToBottom(_scrollController, context);
       });
     }
   }
@@ -188,7 +186,6 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                                     }
                                   },
                                 ),
-                                //todo fix this 1
                                 Consumer<UserViewModel>(
                                   builder: (context, value, child) {
                                     return Text(
@@ -429,16 +426,16 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                       ),
                     ),
                     onSubmitted: (value) async {
-                      context.read<ChatViewModel>().sendMessage(
+                      await context.read<ChatViewModel>().sendMessage(
                             ChatModel(
-                              sender:
-                                  await _authService.getUsername().toString(),
+                              sender: await _authService.getUsername(),
                               message: _controller.text,
                               type: 'text',
                               createdAt: Timestamp.now(),
                             ),
                           );
                       _controller.clear();
+                      scrollToBottom(_scrollController, context);
                     },
                   ),
                 ),
@@ -450,16 +447,16 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                   child: IconButton(
                       icon: const Icon(Icons.send, color: Colors.white),
                       onPressed: () async {
-                        context.read<ChatViewModel>().sendMessage(
+                        await context.read<ChatViewModel>().sendMessage(
                               ChatModel(
-                                sender:
-                                    await _authService.getUsername().toString(),
+                                sender: await _authService.getUsername(),
                                 message: _controller.text,
                                 type: 'text',
                                 createdAt: Timestamp.now(),
                               ),
                             );
                         _controller.clear();
+                        scrollToBottom(_scrollController, context);
                       }),
                 ),
               ],
