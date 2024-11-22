@@ -1,16 +1,14 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:seezme/core/models/chat_model.dart';
-import 'package:seezme/core/providers/navigaton_provider.dart';
 import 'package:seezme/core/services/auth_service.dart';
 import 'package:seezme/core/utility/constans/constants.dart';
 import 'package:seezme/core/utility/helper_function.dart';
 import 'package:seezme/core/viewmodels/chat_view_model.dart';
 import 'package:seezme/core/viewmodels/user_view_model.dart';
-import 'package:seezme/widgets/avatar_widget.dart';
-import 'package:seezme/widgets/message_widget.dart';
+import 'package:seezme/widgets/active_users_widget.dart';
+import 'package:seezme/widgets/chat_widget.dart';
+import 'package:seezme/widgets/send_message_widget.dart';
+import 'package:seezme/widgets/sidebar_profile_widget.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({
@@ -36,7 +34,6 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
     super.initState();
     Provider.of<ChatViewModel>(context, listen: false).fetchMessages();
     Provider.of<UserViewModel>(context, listen: false).fetchUsers();
-    scrollToBottom(_scrollController, context);
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       scrollToBottom(_scrollController, context);
@@ -136,130 +133,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Row(
-                      mainAxisSize: MainAxisSize.max,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            Provider.of<NavigationProvider>(context,
-                                    listen: false)
-                                .goTargetPage(context, Routes.profile);
-                          },
-                          child: Padding(
-                              padding: PaddingSize.paddingStandartSize,
-                              child: AvatarWidget()),
-                        ),
-                        Row(
-                          children: [
-                            Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                FutureBuilder<String?>(
-                                  future: _authService.getUsername(),
-                                  builder: (context, snapshot) {
-                                    if (snapshot.connectionState ==
-                                        ConnectionState.waiting) {
-                                      return CircularProgressIndicator();
-                                    } else if (snapshot.hasError) {
-                                      return Text('Error: ${snapshot.error}');
-                                    } else {
-                                      return Text(
-                                        maxLines: 1,
-                                        snapshot.data ?? '--',
-                                        style: TextStyle(
-                                          color: ConstColors.onPrimaryColor,
-                                          fontSize: FontSize.usernameFontSize,
-                                          fontWeight: FontWeight.bold,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                        overflow: TextOverflow.ellipsis,
-                                      );
-                                    }
-                                  },
-                                ),
-                                Consumer<UserViewModel>(
-                                  builder: (context, value, child) {
-                                    return Text(value.status,
-                                        style: TextStyle(
-                                          color: ConstColors.onPrimaryColor,
-                                          fontSize: FontSize.statusFontSize,
-                                        ));
-                                  },
-                                )
-                              ],
-                            ),
-                            Consumer<UserViewModel>(
-                              builder: (context, value, child) {
-                                return PopupMenuButton<String>(
-                                  iconSize: 30,
-                                  icon: Icon(Icons.arrow_drop_down),
-                                  onSelected: (String value) async {
-                                    String uid = FirebaseAuth
-                                            .instance.currentUser?.uid ??
-                                        "";
-                                    if (uid != "") {
-                                      await Provider.of<UserViewModel>(context,
-                                              listen: false)
-                                          .updateUserStatus(uid, value);
-                                    } else {
-                                      showErrorSnackbar(
-                                          "Check your internet connection",
-                                          context);
-                                    }
-                                  },
-                                  itemBuilder: (BuildContext context) {
-                                    return [
-                                      PopupMenuItem<String>(
-                                        value: Status.statusAvailable,
-                                        child: Text(
-                                          Status.statusAvailable,
-                                          style: TextStyle(
-                                              color: Colors.green,
-                                              fontSize:
-                                                  FontSize.statusFontSize),
-                                        ),
-                                      ),
-                                      PopupMenuItem<String>(
-                                        value: Status.statusIdle,
-                                        child: Text(
-                                          Status.statusIdle,
-                                          style: TextStyle(
-                                              color: Colors.orange,
-                                              fontSize:
-                                                  FontSize.statusFontSize),
-                                        ),
-                                      ),
-                                      PopupMenuItem<String>(
-                                        value: Status.statusBusy,
-                                        child: Text(
-                                          Status.statusBusy,
-                                          style: TextStyle(
-                                              color: Colors.red,
-                                              fontSize:
-                                                  FontSize.statusFontSize),
-                                        ),
-                                      ),
-                                      PopupMenuItem<String>(
-                                        value: Status.statusOffline,
-                                        child: Text(
-                                          Status.statusOffline,
-                                          style: TextStyle(
-                                              color: Colors.grey,
-                                              fontSize:
-                                                  FontSize.statusFontSize),
-                                        ),
-                                      ),
-                                    ];
-                                  },
-                                );
-                              },
-                            ),
-                          ],
-                        )
-                      ],
-                    ),
+                    SidebarProfileWidget(authService: _authService),
                   ],
                 ),
               ),
@@ -291,191 +165,22 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                     },
                   );
                 }),
-            Consumer<UserViewModel>(builder: (context, userViewModel, child) {
-              return ListTile(
-                leading: const Icon(Icons.people),
-                title: const Text(Titles.activeUsers),
-                onTap: () async {
-                  userViewModel.fetchUsers();
-                  userViewModel.refreshStatus();
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return Consumer<UserViewModel>(
-                          builder: (context, userViewModel, child) {
-                        return AlertDialog(
-                          title: const Text(Titles.activeUsers),
-                          content: SizedBox(
-                            width: double.maxFinite,
-                            child: ListView.builder(
-                              shrinkWrap: true,
-                              itemCount: userViewModel.users.length,
-                              itemBuilder: (context, index) {
-                                final user = userViewModel.users[index];
-                                return ListTile(
-                                  title: Text(user.username),
-                                  subtitle: Text(user.status),
-                                  leading: Icon(
-                                    Icons.circle,
-                                    color: user.status == Status.statusAvailable
-                                        ? Colors.green
-                                        : user.status == Status.statusIdle
-                                            ? Colors.orange
-                                            : user.status == Status.statusBusy
-                                                ? Colors.red
-                                                : user.status ==
-                                                        Status.statusOffline
-                                                    ? Colors.grey
-                                                    : Colors.grey,
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                          actions: <Widget>[
-                            TextButton(
-                              child: const Text('Close'),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                          ],
-                        );
-                      });
-                    },
-                  );
-                },
-              );
-            }),
+            ActiveUsersWidget(),
             ..._drawerItems,
           ],
         ),
       ),
       backgroundColor: defaultTheme.primaryColor,
       body: Column(
+        mainAxisSize: MainAxisSize.max,
         children: [
           Expanded(
-            child: Consumer<ChatViewModel>(
-              builder: (context, chatVM, child) {
-                return ListView.builder(
-                  controller: _scrollController,
-                  reverse: false,
-                  itemCount: context.read<ChatViewModel>().messages.length,
-                  itemBuilder: (context, index) {
-                    final message =
-                        context.read<ChatViewModel>().messages[index];
-                    if (message.type == 'text') {
-                      return MessageWidget(
-                        message: message.message,
-                        sender: message.sender,
-                        createdAt: message.createdAt,
-                        index: index,
-                        type: message.type,
-                      );
-                    } else if (message.type == 'media') {
-                      return Image.network(
-                        //todo return to image message model
-                        message.message,
-                        fit: BoxFit.cover,
-                      );
-                    }
-                    return null;
-                  },
-                );
-              },
-            ),
+            child: ChatWidget(scrollController: _scrollController),
           ),
-          Padding(
-            padding: PaddingSize.paddingSmallSize,
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                      controller: _controller,
-                      cursorColor: defaultTheme.primaryColor,
-                      style: TextStyle(
-                        color: defaultTheme.primaryColor,
-                      ),
-                      decoration: InputDecoration(
-                        hintText: 'Send a message...',
-                        hintStyle: TextStyle(color: ConstColors.greyColor),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30.0),
-                          borderSide: BorderSide.none,
-                        ),
-                        filled: true,
-                        fillColor: ConstColors.whiteColor,
-                        contentPadding: const EdgeInsets.symmetric(
-                            vertical: 10.0, horizontal: 20.0),
-                        prefixIcon: IconButton(
-                          icon: Icon(Icons.add, color: ConstColors.greyColor),
-                          onPressed: () {
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  title: Text('Info'),
-                                  content:
-                                      Text('Image send is not available yet'),
-                                  actions: <Widget>[
-                                    TextButton(
-                                      child: Text('OK'),
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
-                          },
-                        ),
-                      ),
-                      onSubmitted: (value) async {
-                        if (_controller.text != "") {
-                          await context.read<ChatViewModel>().sendMessage(
-                                ChatModel(
-                                  sender: await _authService.getUsername(),
-                                  message: _controller.text,
-                                  type: 'text',
-                                  createdAt: Timestamp.now(),
-                                ),
-                              );
-                          _controller.clear();
-                          scrollToBottom(_scrollController, context);
-                        } else {
-                          return null;
-                        }
-                      }),
-                ),
-                const SizedBox(width: 8),
-                Container(
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                  ),
-                  child: IconButton(
-                      icon: const Icon(Icons.send, color: Colors.white),
-                      onPressed: () async {
-                        if (_controller.text != "") {
-                          //todo if message is empty don't send message
-                          await context.read<ChatViewModel>().sendMessage(
-                                ChatModel(
-                                  sender: await _authService.getUsername(),
-                                  message: _controller.text,
-                                  type: 'text',
-                                  createdAt: Timestamp.now(),
-                                ),
-                              );
-                          _controller.clear();
-                          scrollToBottom(_scrollController, context);
-                        } else {
-                          return null;
-                        }
-                      }),
-                ),
-              ],
-            ),
-          ),
+          SendMessageWidget(
+              controller: _controller,
+              authService: _authService,
+              scrollController: _scrollController),
         ],
       ),
     );
