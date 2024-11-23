@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 
 void scrollToBottom(ScrollController _scrollController, BuildContext context) {
   if (_scrollController.hasClients) {
-    final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
-    _scrollController.animateTo(
-      _scrollController.position.maxScrollExtent + keyboardHeight,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeOut,
-    );
+    final position = _scrollController.position;
+    if (position.maxScrollExtent > 0) {
+      final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+      _scrollController.animateTo(
+        position.maxScrollExtent + keyboardHeight,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    }
   }
 }
 

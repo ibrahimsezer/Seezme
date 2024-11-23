@@ -12,6 +12,7 @@ class Routes {
   static const String privacy = "/privacy";
   static const String theme = "/theme_settings";
   static const String splashScreen = "/splash_screen";
+  static const String uitest = "/uitest";
 }
 
 class Titles {
@@ -35,6 +36,29 @@ class Assets {
   static const String logoSquare = 'lib/assets/appimage/logosquare.jpeg';
   static const String profileImage =
       'lib/assets/appimage/default_user_profile_photo.jpeg';
+  static const String profileImage2 =
+      'lib/assets/appimage/default_user_profile_photo_2.jpeg';
+  static const String profileImage3 =
+      'lib/assets/appimage/default_user_profile_photo_3.jpeg';
+  static const String profileImage4 =
+      'lib/assets/appimage/default_user_profile_photo_4.jpeg';
+  static const String profileImage5 =
+      'lib/assets/appimage/default_user_profile_photo_5.jpeg';
+  static const String profileImage6 =
+      'lib/assets/appimage/default_user_profile_photo_6.jpeg';
+  static const String profileImage7 =
+      'lib/assets/appimage/default_user_profile_photo_7.jpeg';
+  static const String profileImage8 =
+      'lib/assets/appimage/default_user_profile_photo_8.jpeg';
+  static const String profileImage9 =
+      'lib/assets/appimage/default_user_profile_photo_9.jpeg';
+  static const String profileImage10 =
+      'lib/assets/appimage/default_user_profile_photo_10.jpeg';
+  static const String profileImage11 =
+      'lib/assets/appimage/default_user_profile_photo_11.jpeg';
+  static const String profileImage12 =
+      'lib/assets/appimage/default_user_profile_photo_12.jpeg';
+
   static const String logo_9_16 = "lib/assets/appimage/logo.jpg";
 }
 
@@ -96,9 +120,10 @@ class ConstColors {
   static const Color orangeWeb = Color(0xFFFEAE03);
   static const Color blackLicorice = Color(0xFF1B1311);
   static const Color blackLicoriceDark = Color(0xFF191210);
+  static const Color green = Color(0xFF10B90D);
 }
 
-String defaultFontFamily = "Roboto";
+String defaultFontFamily = "Zona Pro Family";
 Color defaultTextBackgroundColor = const Color(0xFFFEAE03);
 Color defaultButtonColorDark = const Color(0xFFFEAE03);
 Color defaultButtonBorderColorDark = const Color(0xFFFEAE03);

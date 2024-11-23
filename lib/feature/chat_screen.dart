@@ -119,6 +119,8 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
       ),
       endDrawer: Drawer(
         child: ListView(
+          physics: const BouncingScrollPhysics(),
+          shrinkWrap: true,
           padding: EdgeInsets.zero,
           children: [
             Container(

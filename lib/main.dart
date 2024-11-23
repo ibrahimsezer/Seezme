@@ -17,9 +17,11 @@ import 'package:seezme/feature/settings/notifications.dart';
 import 'package:seezme/feature/settings/privacy.dart';
 import 'package:seezme/core/utility/constans/constants.dart';
 import 'package:seezme/feature/settings/theme_settings.dart';
+import 'package:seezme/widgets/uitest.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await loadFont();
   await Firebase.initializeApp();
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
@@ -32,9 +34,16 @@ void main() async {
         ChangeNotifierProvider(create: (_) => ChatViewModel()),
         ChangeNotifierProvider(create: (_) => UserViewModel()),
       ],
-      child: MyApp(initialRoute: Routes.splashScreen),
+      child: MyApp(initialRoute: Routes.chatScreen),
     ),
   );
+}
+
+Future<void> loadFont() async {
+  await Future.wait([
+    rootBundle.load('lib/assets/fonts/ZonaPro-Bold.otf'),
+    rootBundle.load('lib/assets/fonts/ZonaPro-ExtraLight.otf'),
+  ]);
 }
 
 class MyApp extends StatelessWidget {
@@ -46,7 +55,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: Titles.mainTitle,
-      theme: defaultTheme, // todo rework theme
+      theme: defaultTheme,
       darkTheme: ThemeData.dark(),
       themeMode: Provider.of<ThemeProvider>(context).currentTheme,
       initialRoute: initialRoute,
@@ -60,6 +69,7 @@ class MyApp extends StatelessWidget {
         Routes.theme: (context) => ThemeSettingsPage(),
         Routes.privacy: (context) => PrivacyPage(),
         Routes.splashScreen: (context) => SplashScreen(),
+        Routes.uitest: (context) => Uitest(),
       },
     );
   }
