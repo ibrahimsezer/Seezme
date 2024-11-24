@@ -9,9 +9,9 @@ class StatusButtonWidget extends StatelessWidget {
   const StatusButtonWidget({
     super.key,
   });
-
   @override
   Widget build(BuildContext context) {
+    final userViewModel = Provider.of<UserViewModel>(context);
     return Consumer<UserViewModel>(
       builder: (context, value, child) {
         return PopupMenuButton<String>(
@@ -20,8 +20,8 @@ class StatusButtonWidget extends StatelessWidget {
           onSelected: (String value) async {
             String uid = FirebaseAuth.instance.currentUser?.uid ?? "";
             if (uid != "") {
-              await Provider.of<UserViewModel>(context, listen: false)
-                  .updateUserStatus(uid, value);
+              await userViewModel.updateUserStatus(uid, value);
+              await userViewModel.fetchUsers();
             } else {
               showErrorSnackbar("Check your internet connection", context);
             }

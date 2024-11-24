@@ -32,6 +32,7 @@ class SendMessageWidget extends StatelessWidget {
                 controller: _controller,
                 cursorColor: defaultTheme.primaryColor,
                 style: TextStyle(
+                  fontWeight: FontWeight.bold,
                   color: defaultTheme.primaryColor,
                 ),
                 decoration: InputDecoration(

@@ -142,7 +142,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
             ),
             ListTile(
               leading: const Icon(Icons.add),
-              title: const Text('Add Item'),
+              title: const Text('Add Chats'),
               onTap: _showAddItemDialog,
             ),
             ListTile(
@@ -154,7 +154,8 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                     builder: (BuildContext context) {
                       return AlertDialog(
                         title: Text('Info'),
-                        content: Text('Video Call is not available yet'),
+                        content: Text('Video Call is not available yet',
+                            style: TextStyle(color: ConstColors.whiteColor)),
                         actions: <Widget>[
                           TextButton(
                             child: Text('OK'),
