@@ -1,10 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-//import 'package:provider/provider.dart';
+import 'package:provider/provider.dart';
 import 'package:seezme/core/utility/constans/constants.dart';
-import 'package:seezme/core/utility/helper_function.dart';
-//import 'package:seezme/core/viewmodels/chat_view_model.dart';
+import 'package:seezme/core/viewmodels/chat_view_model.dart';
 import 'package:seezme/widgets/avatar_widget.dart';
 
 class MessageWidget extends StatelessWidget {
@@ -13,7 +11,7 @@ class MessageWidget extends StatelessWidget {
   final Timestamp createdAt;
   final int index;
   final String type;
-  //final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   MessageWidget({
     super.key,
@@ -28,36 +26,31 @@ class MessageWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onLongPress: () {
-        Clipboard.setData(ClipboardData(text: message));
-        showInfoSnackbar(
-          'Message copied to clipboard.',
-          context,
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Delete Message'),
+              content: const Text('Do you want to delete this message?'),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('Cancel'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                TextButton(
+                  child: const Text('Delete'),
+                  onPressed: () async {
+                    Provider.of<ChatViewModel>(context, listen: false)
+                        .deleteMessage(_firestore.collection('chats').doc().id);
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
         );
-        // showDialog(
-        //   context: context,
-        //   builder: (BuildContext context) {
-        //     return AlertDialog(
-        //       title: const Text('Delete Message'),
-        //       content: const Text('Do you want to delete this message?'),
-        //       actions: <Widget>[
-        //         TextButton(
-        //           child: const Text('Cancel'),
-        //           onPressed: () {
-        //             Navigator.of(context).pop();
-        //           },
-        //         ),
-        //         TextButton(
-        //           child: const Text('Delete'),
-        //           onPressed: () async {
-        //             Provider.of<ChatViewModel>(context, listen: false)
-        //                 .deleteMessage("");
-        //             Navigator.of(context).pop();
-        //           },
-        //         ),
-        //       ],
-        //     );
-        //   },
-        // );
       },
       child: Container(
         decoration: BoxDecoration(

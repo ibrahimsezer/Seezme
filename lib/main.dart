@@ -9,7 +9,7 @@ import 'package:seezme/core/utility/splash_screen.dart';
 import 'package:seezme/core/viewmodels/chat_view_model.dart';
 import 'package:seezme/core/viewmodels/user_view_model.dart';
 import 'package:seezme/feature/chat_screen.dart';
-import 'package:seezme/feature/connection/webrtc.dart';
+import 'package:seezme/feature/connection/jitsi.dart';
 import 'package:seezme/feature/login/login.dart';
 import 'package:seezme/feature/profile/profile.dart';
 import 'package:seezme/feature/register/register.dart';
@@ -64,12 +64,14 @@ class MyApp extends StatelessWidget {
         Routes.login: (context) => const LoginPage(),
         Routes.profile: (context) => const ProfileScreen(),
         Routes.chatScreen: (context) => const ChatScreen(),
-        Routes.webrtc: (context) => VideoCallScreen(),
         Routes.notifications: (context) => NotificationsPage(),
         Routes.theme: (context) => ThemeSettingsPage(),
         Routes.privacy: (context) => PrivacyPage(),
         Routes.splashScreen: (context) => SplashScreen(),
         Routes.uitest: (context) => Uitest(),
+        Routes.test: (context) => const JitsiApp(
+              title: 'Jitsi',
+            ),
       },
     );
   }

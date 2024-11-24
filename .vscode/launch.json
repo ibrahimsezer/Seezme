@@ -1,7 +1,21 @@
 {
     "version": "0.2.0",
     "configurations": [
-      
+          {
+            "name": "Flutter (Physical Device - SM A217F)",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/main.dart",
+            "deviceId": "RF8N8337B3F"
+          },
+          {
+            "name": "Flutter (Emulator - sdk gphone64 x86 64)",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/main.dart",
+            "deviceId": "emulator-5554"
+          },
+
       {
         "name": "Flutter",
         "request": "launch",

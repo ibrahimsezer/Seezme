@@ -1,14 +1,28 @@
 allprojects {
     repositories {
-        google()
-        mavenCentral()
+        google()  // Google's Maven repository
+        mavenCentral()  // Maven Central repository
+    }
+}
+
+buildscript {
+    repositories {
+        google()  // Google repository to resolve Android tools
+        mavenCentral()  // Maven repository for other dependencies
+    }
+    dependencies {
+        // Ensure the plugin version exists or try using a stable version like 8.0.2
+        classpath 'com.android.tools.build:gradle:8.0.2'  // Try a different stable version
+        classpath 'com.google.gms:google-services:4.4.2'  // Google services plugin
     }
 }
 
 rootProject.buildDir = "../build"
+
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
 }
+
 subprojects {
     project.evaluationDependsOn(":app")
 }

@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class ChatModel {
   final String sender;
   final String message;
-  final String type; // text/image/audio
+  final String type;
   final Timestamp createdAt;
 
   ChatModel({
