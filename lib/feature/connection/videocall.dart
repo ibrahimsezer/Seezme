@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:jitsi_meet_flutter_sdk/jitsi_meet_flutter_sdk.dart';
 import 'package:seezme/core/services/auth_service.dart';
-import 'package:seezme/core/utility/constans/constants.dart';
 import 'package:seezme/widgets/active_users_widget.dart';
+import 'package:seezme/widgets/joincall_widget.dart';
 import 'package:seezme/widgets/sidebar_profile_widget.dart';
 import 'package:seezme/widgets/sidemenu_button_widget.dart';
 import 'package:seezme/widgets/sidemenu_drawer_widget.dart';
@@ -18,10 +18,11 @@ class VideoCallWidget extends StatefulWidget {
 class _VideoCallWidgetState extends State<VideoCallWidget> {
   final _auth = AuthService();
   final jitsiMeet = JitsiMeet();
+  final List<Widget> channelList = [];
   void join() async {
     var options = JitsiMeetConferenceOptions(
       serverURL: "https://meet.jit.si",
-      room: "seezmetestroom", //https://meet.jit.si/{room}
+      room: "seezmeTestRoom_", //https://meet.jit.si/{room}
       configOverrides: {
         "startWithAudioMuted": false,
         "startWithVideoMuted": true,
@@ -57,17 +58,15 @@ class _VideoCallWidgetState extends State<VideoCallWidget> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SidebarProfileWidget(authService: _auth),
-                ElevatedButton(
-                  style: ButtonStyle(
-                      backgroundColor:
-                          WidgetStateProperty.all(ConstColors.orangeWeb)),
-                  onPressed: () {
-                    join();
-                  },
-                  child: Text("Join Call",
-                      style: TextStyle(color: ConstColors.blackLicorice)),
-                ),
+                JoinCallWidget(onPressed: join, channelName: "Join Call")
               ],
+            ),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              physics: BouncingScrollPhysics(),
+              child: Row(
+                children: [],
+              ),
             ),
             ActiveUsersWidget(),
           ],

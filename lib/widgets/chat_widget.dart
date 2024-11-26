@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:seezme/core/utility/helper_function.dart';
 import 'package:seezme/core/viewmodels/chat_view_model.dart';
 import 'package:seezme/widgets/message_widget.dart';
 
@@ -18,13 +19,13 @@ class ChatWidget extends StatelessWidget {
         Expanded(
           child: Consumer<ChatViewModel>(
             builder: (context, chatVM, child) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {});
               return ListView.builder(
                 controller: _scrollController,
                 reverse: false,
-                itemCount: context.watch<ChatViewModel>().messages.length,
+                itemCount: chatVM.messages.length,
                 itemBuilder: (context, index) {
-                  final message =
-                      context.watch<ChatViewModel>().messages[index];
+                  final message = chatVM.messages[index];
                   if (message.type == 'text') {
                     return MessageWidget(
                       message: message.message,

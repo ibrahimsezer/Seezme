@@ -24,91 +24,99 @@ class MessageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onLongPress: () {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Delete Message'),
-              content: const Text('Do you want to delete this message?'),
-              actions: <Widget>[
-                TextButton(
-                  child: const Text('Cancel'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
+    return Consumer<ChatViewModel>(builder: (context, chatViewModel, child) {
+      return GestureDetector(
+        onLongPress: () {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('Delete Message'),
+                content: const Text(
+                  'Do you want to delete this message?',
+                  style: TextStyle(color: ConstColors.whiteColor),
                 ),
-                TextButton(
-                  child: const Text('Delete'),
-                  onPressed: () async {
-                    Provider.of<ChatViewModel>(context, listen: false)
-                        .deleteMessage(_firestore.collection('chats').doc().id);
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
-            );
-          },
-        );
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          color: defaultTextBackgroundColor,
-          borderRadius: BorderRadius.circular(8.0),
-        ),
-        padding: const EdgeInsets.all(8.0),
-        margin: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                InkWell(
-                  onTap: () {},
-                  child: AvatarWidget(),
-                ),
-                const SizedBox(width: 10),
-                Text(
-                  sender, // Kullanıcı adı
-                  style: const TextStyle(
-                      color: ConstColors.fontColor,
-                      fontSize: FontSize.usernameFontSize,
-                      fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-            Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      message,
-                      style: const TextStyle(
+                actions: <Widget>[
+                  TextButton(
+                    child: const Text('Cancel'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                  TextButton(
+                    child: const Text(
+                      'Delete',
+                    ),
+                    onPressed: () async {
+                      //todo rework deleteMessage function
+                      await chatViewModel.deleteMessage(
+                          _firestore.collection('chats').doc().id);
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              );
+            },
+          );
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            color: defaultTextBackgroundColor,
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+          padding: const EdgeInsets.all(8.0),
+          margin: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  InkWell(
+                    onTap: () {},
+                    child: AvatarWidget(),
+                  ),
+                  const SizedBox(width: 10),
+                  Text(
+                    sender, // Kullanıcı adı
+                    style: const TextStyle(
                         color: ConstColors.fontColor,
-                        fontSize: FontSize.textFontSize,
-                        fontWeight: FontWeight.bold,
+                        fontSize: FontSize.usernameFontSize,
+                        fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+              Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        message,
+                        style: const TextStyle(
+                          color: ConstColors.fontColor,
+                          fontSize: FontSize.textFontSize,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        maxLines: null,
+                        overflow: TextOverflow.visible,
                       ),
-                      maxLines: null,
-                      overflow: TextOverflow.visible,
                     ),
                   ),
-                ),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: Text(
-                    createdAt.toDate().toString().substring(0, 19),
-                    style: const TextStyle(
-                        color: ConstColors.dateColor,
-                        fontSize: FontSize.dateFontSize),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: Text(
+                      createdAt.toDate().toString().substring(0, 19),
+                      style: const TextStyle(
+                          color: ConstColors.dateColor,
+                          fontSize: FontSize.dateFontSize),
+                    ),
                   ),
-                ),
-              ],
-            ),
-          ],
+                ],
+              ),
+            ],
+          ),
         ),
-      ),
-    );
+      );
+    });
   }
 }

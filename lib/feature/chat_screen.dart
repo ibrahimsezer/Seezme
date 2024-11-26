@@ -22,11 +22,8 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-
-  //new
-  //ChatViewModel _chatViewModel = ChatViewModel();
-  //UserViewModel _userViewModel = UserViewModel();
   AuthService _authService = AuthService();
+
   @override
   void initState() {
     super.initState();
@@ -49,6 +46,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
     }
   }
 
+//todo fetch messasge scrolling not working
   @override
   Widget build(BuildContext context) {
     double sizeWidth = MediaQuery.of(context).size.width;
