@@ -9,7 +9,7 @@ import 'package:seezme/core/utility/splash_screen.dart';
 import 'package:seezme/core/viewmodels/chat_view_model.dart';
 import 'package:seezme/core/viewmodels/user_view_model.dart';
 import 'package:seezme/feature/chat_screen.dart';
-import 'package:seezme/feature/connection/jitsi.dart';
+import 'package:seezme/feature/connection/videocall.dart';
 import 'package:seezme/feature/login/login.dart';
 import 'package:seezme/feature/profile/profile.dart';
 import 'package:seezme/feature/register/register.dart';
@@ -69,8 +69,8 @@ class MyApp extends StatelessWidget {
         Routes.privacy: (context) => PrivacyPage(),
         Routes.splashScreen: (context) => SplashScreen(),
         Routes.uitest: (context) => Uitest(),
-        Routes.test: (context) => const JitsiApp(
-              title: 'Jitsi',
+        Routes.videocall: (context) => const VideoCallWidget(
+              title: Titles.mainTitle,
             ),
       },
     );

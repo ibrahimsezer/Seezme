@@ -13,7 +13,7 @@ class Routes {
   static const String theme = "/theme_settings";
   static const String splashScreen = "/splash_screen";
   static const String uitest = "/uitest";
-  static const String test = "/jitsi";
+  static const String videocall = "/videocall";
 }
 
 class Titles {
@@ -28,7 +28,7 @@ class Titles {
   static const String notifications = "Notifications";
   static const String privacy = "Privacy";
   static const String theme = "Theme";
-  static const String activeUsers = "Active Users";
+  static const String allUsers = "All Users";
 }
 
 class Assets {
@@ -122,6 +122,8 @@ class ConstColors {
   static const Color blackLicorice = Color(0xFF1B1311);
   static const Color blackLicoriceDark = Color(0xFF191210);
   static const Color green = Color(0xFF10B90D);
+
+  static var white;
 }
 
 String defaultFontFamily = "Zona Pro Family";

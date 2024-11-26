@@ -5,10 +5,10 @@ import 'package:seezme/core/utility/constans/constants.dart';
 import 'package:seezme/core/utility/helper_function.dart';
 import 'package:seezme/core/viewmodels/chat_view_model.dart';
 import 'package:seezme/core/viewmodels/user_view_model.dart';
-import 'package:seezme/widgets/active_users_widget.dart';
 import 'package:seezme/widgets/chat_widget.dart';
 import 'package:seezme/widgets/send_message_widget.dart';
-import 'package:seezme/widgets/sidebar_profile_widget.dart';
+import 'package:seezme/widgets/sidemenu_button_widget.dart';
+import 'package:seezme/widgets/sidemenu_drawer_widget.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({
@@ -22,8 +22,6 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-
-  List<Widget> _drawerItems = [];
 
   //new
   //ChatViewModel _chatViewModel = ChatViewModel();
@@ -51,47 +49,6 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
     }
   }
 
-  void _addDrawerItem(String type) {
-    setState(() {
-      _drawerItems.add(
-        ListTile(
-          leading: Icon(type == 'Chat' ? Icons.chat : Icons.voice_chat),
-          title: Text(type),
-          onTap: () {},
-        ),
-      );
-    });
-  }
-
-  void _showAddItemDialog() {
-    showDialog(
-      useRootNavigator: true,
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Add Item'),
-          content: const Text('What type of item would you like to add?'),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Chat'),
-              onPressed: () {
-                _addDrawerItem('Chat');
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: const Text('Voice Chat'),
-              onPressed: () {
-                _addDrawerItem('Voice Chat');
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     double sizeWidth = MediaQuery.of(context).size.width;
@@ -101,78 +58,11 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
         title:
             const Text(Titles.mainTitle, style: TextStyle(color: Colors.white)),
         backgroundColor: defaultTheme.primaryColor,
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 18.0),
-            child: Builder(
-              builder: (context) => IconButton(
-                iconSize: 30,
-                icon: const Icon(Icons.menu),
-                color: Colors.white,
-                onPressed: () {
-                  Scaffold.of(context).openEndDrawer();
-                },
-              ),
-            ),
-          )
-        ],
+        actions: [SideMenuButtonWidget()],
       ),
-      endDrawer: Drawer(
-        child: ListView(
-          physics: const BouncingScrollPhysics(),
-          shrinkWrap: true,
-          padding: EdgeInsets.zero,
-          children: [
-            Container(
-              height: sizeWidth * 0.4,
-              decoration: BoxDecoration(
-                color: defaultTheme.primaryColor,
-              ),
-              child: Container(
-                height: sizeWidth * 0.4,
-                child: Column(
-                  mainAxisSize: MainAxisSize.max,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SidebarProfileWidget(authService: _authService),
-                  ],
-                ),
-              ),
-            ),
-            AllChatsWidget(),
-            ListTile(
-                leading: const Icon(Icons.video_call),
-                title: const Text("Video Call"),
-                onTap: () {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: Text('Info'),
-                        content: Text('Video Call is not available yet',
-                            style: TextStyle(color: ConstColors.whiteColor)),
-                        actions: <Widget>[
-                          TextButton(
-                            child: Text('OK'),
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                }),
-            ActiveUsersWidget(),
-            ..._drawerItems,
-            FloatingActionButton.small(
-                onPressed: () async =>
-                    Provider.of<ChatViewModel>(context, listen: false)
-                        .deleteAllMessage,
-                child: const Icon(Icons.delete_forever)),
-          ],
-        ),
+      endDrawer: SideMenuDrawerWidget(
+        sizeWidth: sizeWidth,
+        authService: _authService,
       ),
       backgroundColor: defaultTheme.primaryColor,
       body: Column(
@@ -188,49 +78,5 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
         ],
       ),
     );
-  }
-}
-
-class AllChatsWidget extends StatefulWidget {
-  const AllChatsWidget({
-    super.key,
-  });
-
-  @override
-  State<AllChatsWidget> createState() => _AllChatsWidgetState();
-}
-
-class _AllChatsWidgetState extends State<AllChatsWidget> {
-  bool _isExpanded = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return Consumer<ChatViewModel>(builder: (context, chatViewModel, child) {
-      return Column(
-        children: [
-          ListTile(
-            leading: const Icon(Icons.add),
-            title: const Text('Add Chats'),
-            onTap: () async {
-              await chatViewModel.createNewChatRoom('chatId_1');
-              setState(() {
-                _isExpanded = !_isExpanded;
-              });
-            },
-          ),
-          if (_isExpanded)
-            //todo return allchat list with widget
-            ListView.builder(
-              shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
-              itemCount: chatViewModel.allChatList.length,
-              itemBuilder: (context, index) {
-                final chatList = chatViewModel.allChatList[index];
-                return Text(chatList.message);
-              },
-            ),
-        ],
-      );
-    });
   }
 }

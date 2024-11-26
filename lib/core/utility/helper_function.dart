@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:seezme/core/utility/constans/constants.dart';
 
 void scrollToBottom(ScrollController _scrollController, BuildContext context) {
   if (_scrollController.hasClients) {
@@ -28,4 +29,27 @@ void showInfoSnackbar(String message, BuildContext context) {
     duration: const Duration(seconds: 1),
   );
   ScaffoldMessenger.of(context).showSnackBar(snackBar);
+}
+
+void showInfoDialog(String title, String message, BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text(title),
+        content: Text(
+          message,
+          style: TextStyle(color: ConstColors.whiteColor),
+        ),
+        actions: <Widget>[
+          TextButton(
+            child: const Text('OK'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
+    },
+  );
 }

@@ -54,7 +54,9 @@ class SendMessageWidget extends StatelessWidget {
                         builder: (BuildContext context) {
                           return AlertDialog(
                             title: Text('Info'),
-                            content: Text('Image send is not available yet'),
+                            content: Text('Image send is not available yet',
+                                style:
+                                    TextStyle(color: ConstColors.whiteColor)),
                             actions: <Widget>[
                               TextButton(
                                 child: Text('OK'),
@@ -79,6 +81,7 @@ class SendMessageWidget extends StatelessWidget {
                             createdAt: Timestamp.now(),
                           ),
                         );
+                    await context.read<ChatViewModel>().fetchMessages();
                     _controller.clear();
                     scrollToBottom(_scrollController, context);
                   } else {
@@ -104,6 +107,7 @@ class SendMessageWidget extends StatelessWidget {
                             createdAt: Timestamp.now(),
                           ),
                         );
+                    await context.read<ChatViewModel>().fetchMessages();
                     _controller.clear();
                     scrollToBottom(_scrollController, context);
                   } else {

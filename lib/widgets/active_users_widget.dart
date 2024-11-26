@@ -17,11 +17,12 @@ class _ActiveUsersWidget1State extends State<ActiveUsersWidget> {
   @override
   Widget build(BuildContext context) {
     return Consumer<UserViewModel>(builder: (context, userViewModel, child) {
+      final userCount = userViewModel.users.length.toString();
       return Column(
         children: [
           ListTile(
             leading: const Icon(Icons.people),
-            title: const Text(Titles.activeUsers),
+            title: Text(Titles.allUsers + ' ($userCount)'),
             onTap: () async {
               await userViewModel.fetchUsers();
               userViewModel.refreshStatus();
