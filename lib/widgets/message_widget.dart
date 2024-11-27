@@ -76,7 +76,7 @@ class MessageWidget extends StatelessWidget {
                   ),
                   const SizedBox(width: 10),
                   Text(
-                    sender, // Kullanıcı adı
+                    sender,
                     style: const TextStyle(
                         color: ConstColors.fontColor,
                         fontSize: FontSize.usernameFontSize,

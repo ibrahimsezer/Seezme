@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import 'package:seezme/core/models/chat_model.dart';
 import 'package:seezme/core/services/auth_service.dart';
 import 'package:seezme/core/utility/constans/constants.dart';
-import 'package:seezme/core/utility/helper_function.dart';
 import 'package:seezme/core/viewmodels/chat_view_model.dart';
 
 class SendMessageWidget extends StatelessWidget {
@@ -54,7 +53,7 @@ class SendMessageWidget extends StatelessWidget {
                           context: context,
                           builder: (BuildContext context) {
                             return AlertDialog(
-                              title: Text('Info'),
+                              title: Text('Info'), //todo
                               content: Text('Image send is not available yet',
                                   style:
                                       TextStyle(color: ConstColors.whiteColor)),
@@ -74,8 +73,10 @@ class SendMessageWidget extends StatelessWidget {
                   ),
                   onSubmitted: (value) async {
                     if (_controller.text != "") {
-                      await chatViewModel.sendMessage(
+                      await Provider.of<ChatViewModel>(context, listen: false)
+                          .sendMessage(
                         ChatModel(
+                          id: await _authService.auth.currentUser.uid,
                           sender: await _authService.getUsername(),
                           message: _controller.text,
                           type: 'text',
@@ -83,7 +84,6 @@ class SendMessageWidget extends StatelessWidget {
                         ),
                       );
                       _controller.clear();
-                      scrollToBottom(_scrollController, context);
                     } else {
                       return null;
                     }
@@ -98,8 +98,10 @@ class SendMessageWidget extends StatelessWidget {
                   icon: const Icon(Icons.send, color: Colors.white),
                   onPressed: () async {
                     if (_controller.text != "") {
-                      await chatViewModel.sendMessage(
+                      await Provider.of<ChatViewModel>(context, listen: false)
+                          .sendMessage(
                         ChatModel(
+                          id: await _authService.auth.currentUser.uid,
                           sender: await _authService.getUsername(),
                           message: _controller.text,
                           type: 'text',
@@ -107,7 +109,6 @@ class SendMessageWidget extends StatelessWidget {
                         ),
                       );
                       _controller.clear();
-                      scrollToBottom(_scrollController, context);
                     } else {
                       return null;
                     }

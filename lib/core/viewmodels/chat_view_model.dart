@@ -10,6 +10,19 @@ class ChatViewModel with ChangeNotifier {
   List<ChatModel> get messages => _messages;
   List<ChatModel> get allChatList => _allChatList;
 
+  void listenToMessages() {
+    _firestore
+        .collection('chats')
+        .orderBy('createdAt', descending: false)
+        .snapshots()
+        .listen((snapshot) {
+      _messages = snapshot.docs
+          .map((doc) => ChatModel.fromFirestore(doc.data()))
+          .toList();
+      notifyListeners();
+    });
+  }
+
   Future<void> fetchMessages() async {
     final snapshot =
         await _firestore.collection('chats').orderBy('createdAt').get();

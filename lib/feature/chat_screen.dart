@@ -27,10 +27,16 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
-    Provider.of<ChatViewModel>(context, listen: false).fetchMessages();
-    Provider.of<UserViewModel>(context, listen: false).fetchUsers();
+    final chatViewModel = Provider.of<ChatViewModel>(context, listen: false);
+    final userViewModel = Provider.of<UserViewModel>(context, listen: false);
+    chatViewModel.fetchMessages();
+    userViewModel.fetchUsers();
+
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      scrollToBottom(_scrollController, context);
+    });
+    chatViewModel.addListener(() {
       scrollToBottom(_scrollController, context);
     });
   }

@@ -19,6 +19,8 @@ class ChatWidget extends StatelessWidget {
         Expanded(
           child: Consumer<ChatViewModel>(
             builder: (context, chatVM, child) {
+              chatVM.listenToMessages();
+              scrollToBottom(_scrollController, context);
               WidgetsBinding.instance.addPostFrameCallback((_) {});
               return ListView.builder(
                 controller: _scrollController,
