@@ -14,6 +14,7 @@ class Routes {
   static const String splashScreen = "/splash_screen";
   static const String uitest = "/uitest";
   static const String videocall = "/videocall";
+  static const String videocallWindows = "/videocallwindows";
 }
 
 class Titles {

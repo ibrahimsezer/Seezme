@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:seezme/core/models/chat_model.dart';
 import 'package:seezme/core/services/auth_service.dart';
 import 'package:seezme/core/utility/constans/constants.dart';
+import 'package:seezme/core/utility/helper_function.dart';
 import 'package:seezme/core/viewmodels/chat_view_model.dart';
 
 class SendMessageWidget extends StatelessWidget {
@@ -84,6 +85,7 @@ class SendMessageWidget extends StatelessWidget {
                         ),
                       );
                       _controller.clear();
+                      scrollToBottom(_scrollController, context);
                     } else {
                       return null;
                     }
@@ -109,6 +111,7 @@ class SendMessageWidget extends StatelessWidget {
                         ),
                       );
                       _controller.clear();
+                      scrollToBottom(_scrollController, context);
                     } else {
                       return null;
                     }

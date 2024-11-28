@@ -103,6 +103,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   width: sizeWidth * 0.3,
                   child: Image.asset(
                     Assets.logoTransparent,
+                    fit: BoxFit.fitWidth,
                   ))
             ],
           ),

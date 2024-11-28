@@ -10,6 +10,7 @@ import 'package:seezme/core/viewmodels/chat_view_model.dart';
 import 'package:seezme/core/viewmodels/user_view_model.dart';
 import 'package:seezme/feature/chat_screen.dart';
 import 'package:seezme/feature/connection/videocall.dart';
+import 'package:seezme/feature/connection/videocallwindows.dart';
 import 'package:seezme/feature/login/login.dart';
 import 'package:seezme/feature/profile/profile.dart';
 import 'package:seezme/feature/register/register.dart';
@@ -22,7 +23,15 @@ import 'package:seezme/widgets/uitest.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await loadFont();
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(
+      options: FirebaseOptions(
+          apiKey: "AIzaSyDXGBqRAmY8cLq6Mug9s1ppZwRr6bQkJmY",
+          authDomain: "seezme.firebaseapp.com",
+          projectId: "seezme",
+          storageBucket: "seezme.firebasestorage.app",
+          messagingSenderId: "879681053278",
+          appId: "1:879681053278:web:edbbd806790cfb6d68cacf",
+          measurementId: "G-YS5GRQ2MJB"));
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
   runApp(
@@ -69,6 +78,7 @@ class MyApp extends StatelessWidget {
         Routes.privacy: (context) => PrivacyPage(),
         Routes.splashScreen: (context) => SplashScreen(),
         Routes.uitest: (context) => Uitest(),
+        Routes.videocallWindows: (context) => VideoCallWindows(),
         Routes.videocall: (context) => const VideoCallWidget(
               title: Titles.mainTitle,
             ),
