@@ -23,15 +23,7 @@ import 'package:seezme/widgets/uitest.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await loadFont();
-  await Firebase.initializeApp(
-      options: FirebaseOptions(
-          apiKey: "AIzaSyDXGBqRAmY8cLq6Mug9s1ppZwRr6bQkJmY",
-          authDomain: "seezme.firebaseapp.com",
-          projectId: "seezme",
-          storageBucket: "seezme.firebasestorage.app",
-          messagingSenderId: "879681053278",
-          appId: "1:879681053278:web:edbbd806790cfb6d68cacf",
-          measurementId: "G-YS5GRQ2MJB"));
+  await Firebase.initializeApp();
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
   runApp(
@@ -50,8 +42,8 @@ void main() async {
 
 Future<void> loadFont() async {
   await Future.wait([
-    rootBundle.load('lib/assets/fonts/ZonaPro-Bold.otf'),
-    rootBundle.load('lib/assets/fonts/ZonaPro-ExtraLight.otf'),
+    rootBundle.load(defaultFontBold),
+    rootBundle.load(defaultFontExtraLight),
   ]);
 }
 
@@ -79,9 +71,7 @@ class MyApp extends StatelessWidget {
         Routes.splashScreen: (context) => SplashScreen(),
         Routes.uitest: (context) => Uitest(),
         Routes.videocallWindows: (context) => VideoCallWindows(),
-        Routes.videocall: (context) => const VideoCallWidget(
-              title: Titles.mainTitle,
-            ),
+        Routes.videocall: (context) => VideoCallWidget(),
       },
     );
   }

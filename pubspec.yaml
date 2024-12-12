@@ -45,12 +45,8 @@ dependencies:
   permission_handler: ^11.3.1
   shared_preferences: ^2.3.3
   firebase_storage: ^12.3.6
-  jitsi_meet_flutter_sdk: ^10.3.0
   win32: ^5.8.0
-  flutter_inappwebview: ^6.1.5
-  http: ^1.2.2
-  url_launcher: ^6.3.1
-
+  flutter_webrtc: ^0.12.3
 
 dev_dependencies:
   flutter_test:

@@ -128,6 +128,8 @@ class ConstColors {
 }
 
 String defaultFontFamily = "Zona Pro Family";
+String defaultFontBold = 'lib/assets/fonts/ZonaPro-Bold.otf';
+String defaultFontExtraLight = 'lib/assets/fonts/ZonaPro-ExtraLight.otf';
 Color defaultTextBackgroundColor = const Color(0xFFFEAE03);
 Color defaultButtonColorDark = const Color(0xFFFEAE03);
 Color defaultButtonBorderColorDark = const Color(0xFFFEAE03);
@@ -140,35 +142,31 @@ TextStyle errorTextStyle = TextStyle(
 
 ThemeData defaultTheme = ThemeData(
   colorScheme: const ColorScheme(
-    primary: ConstColors.primaryColor, // Ana renk
-    secondary: ConstColors.secondaryColor, // İkincil renk
-    surface: ConstColors.surfaceColor, // Yüzey rengi
-    error: ConstColors.errorColor, // Hata rengi
-    onPrimary: ConstColors.onPrimaryColor, // Ana renk üzerindeki yazı rengi
-    onSecondary:
-        ConstColors.onSecondaryColor, // İkincil renk üzerindeki yazı rengi
-    onSurface: ConstColors.onSurfaceColor, // Yüzey rengi üzerindeki yazı rengi
-    onError: ConstColors.onErrorColor, // Hata rengi üzerindeki yazı rengi
-    brightness: Brightness.dark, // Tema parlaklığı
+    primary: ConstColors.primaryColor,
+    secondary: ConstColors.secondaryColor,
+    surface: ConstColors.surfaceColor,
+    error: ConstColors.errorColor,
+    onPrimary: ConstColors.onPrimaryColor,
+    onSecondary: ConstColors.onSecondaryColor,
+    onSurface: ConstColors.onSurfaceColor,
+    onError: ConstColors.onErrorColor,
+    brightness: Brightness.dark,
   ),
-  primaryColor: ConstColors.primaryColor, // Ana renk
+  primaryColor: ConstColors.primaryColor,
   textButtonTheme: TextButtonThemeData(
     style: ButtonStyle(
       foregroundColor:
           WidgetStateProperty.all<Color>(ConstColors.foregroundColor),
-      backgroundColor: WidgetStateProperty.all<Color>(
-          ConstColors.backgroundColor), // Buton arka plan rengi
+      backgroundColor:
+          WidgetStateProperty.all<Color>(ConstColors.backgroundColor),
     ),
   ),
   textTheme: TextTheme(
-    bodyLarge: TextStyle(
-        fontFamily: defaultFontFamily,
-        color: ConstColors.fontColor), // Büyük metin rengi
-    bodyMedium: TextStyle(
-        fontFamily: defaultFontFamily,
-        color: ConstColors.fontColor), // Orta metin rengi
-    displayLarge: TextStyle(
-        fontFamily: defaultFontFamily,
-        color: ConstColors.fontColor), // Büyük başlık rengi
+    bodyLarge:
+        TextStyle(fontFamily: defaultFontFamily, color: ConstColors.fontColor),
+    bodyMedium:
+        TextStyle(fontFamily: defaultFontFamily, color: ConstColors.fontColor),
+    displayLarge:
+        TextStyle(fontFamily: defaultFontFamily, color: ConstColors.fontColor),
   ),
 );

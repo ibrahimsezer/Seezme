@@ -24,8 +24,9 @@ class _ActiveUsersWidget1State extends State<ActiveUsersWidget> {
             leading: const Icon(Icons.people),
             title: Text(Titles.allUsers + ' ($userCount)'),
             onTap: () async {
+              //todo check await control
               await userViewModel.fetchUsers();
-              userViewModel.refreshStatus();
+              await userViewModel.refreshStatus();
               setState(() {
                 _isExpanded = !_isExpanded;
               });

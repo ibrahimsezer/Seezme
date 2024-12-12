@@ -16,17 +16,16 @@ class UserViewModel with ChangeNotifier {
   String _status = Status.statusOffline;
   String get status => _status;
 
-  void refreshStatus() {
+  Future<void> refreshStatus() async {
     _status;
     notifyListeners();
   }
 
-  void updateStatus(String newStatus) {
+  Future<void> updateStatus(String newStatus) async {
     _status = newStatus;
     notifyListeners();
   }
 
-  //get user from firestore
   Future<void> fetchUsers() async {
     final snapshot =
         await _firestore.collection('users').orderBy('username').get();
