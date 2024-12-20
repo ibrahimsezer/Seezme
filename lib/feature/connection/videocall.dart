@@ -47,8 +47,9 @@ class _VideoCallWidgetState extends State<VideoCallWidget> {
       'video': {'facingMode': 'user'}
     });
 
-    _localRenderer.srcObject = _localStream;
-
+    setState(() {
+      _localRenderer.srcObject = _localStream;
+    });
     // Configure STUN servers
     final configuration = {
       'iceServers': [
@@ -85,6 +86,7 @@ class _VideoCallWidgetState extends State<VideoCallWidget> {
     final room = RoomModel(roomId: '', roomName: 'TestRoom', ownerId: '');
     try {
       _roomId = await _roomViewModel.createRoom(room);
+      setState(() {});
       // Create offer
       RTCSessionDescription offer = await _peerConnection!.createOffer();
       await _peerConnection!.setLocalDescription(offer);
