@@ -82,106 +82,113 @@ class _VideoCallWidgetState extends State<VideoCallWidget> {
   }
 
   Future<void> _createRoom() async {
-    final room = RoomModel(roomId: '', roomName: 'TestRoom');
-    _roomId = await _roomViewModel.createRoom(room);
+    final room = RoomModel(roomId: '', roomName: 'TestRoom', ownerId: '');
+    try {
+      _roomId = await _roomViewModel.createRoom(room);
+      // Create offer
+      RTCSessionDescription offer = await _peerConnection!.createOffer();
+      await _peerConnection!.setLocalDescription(offer);
 
-    // Create offer
-    RTCSessionDescription offer = await _peerConnection!.createOffer();
-    await _peerConnection!.setLocalDescription(offer);
-
-    final roomRef = _firestore.collection('rooms').doc(_roomId);
-
-    // Save offer to Firestore
-    await roomRef.update({
-      'offer': {
-        'type': offer.type,
-        'sdp': offer.sdp,
-      },
-    });
-
-    // Listen for remote answer
-    roomRef.snapshots().listen((snapshot) async {
-      if (snapshot.data() != null && snapshot.data()!['answer'] != null) {
-        final answer = snapshot.data()!['answer'];
-        await _peerConnection!.setRemoteDescription(
-          RTCSessionDescription(answer['sdp'], answer['type']),
-        );
-      }
-    });
-
-    // Add ICE candidates
-    _peerConnection!.onIceCandidate = (candidate) {
-      roomRef.collection('callerCandidates').add({
-        'candidate': candidate.toMap(),
+      // Save offer to Firestore
+      final roomRef = _firestore.collection('rooms').doc(_roomId);
+      await roomRef.update({
+        'offer': {
+          'type': offer.type,
+          'sdp': offer.sdp,
+        },
       });
-    };
 
-    roomRef.collection('calleeCandidates').snapshots().listen((snapshot) {
-      for (var change in snapshot.docChanges) {
-        if (change.type == DocumentChangeType.added) {
-          final data = change.doc.data();
-          _peerConnection!.addCandidate(RTCIceCandidate(
-            data!['candidate']['candidate'],
-            data['candidate']['sdpMid'],
-            data['candidate']['sdpMLineIndex'],
-          ));
+      // Listen for remote answer
+      roomRef.snapshots().listen((snapshot) async {
+        if (snapshot.data() != null && snapshot.data()!['answer'] != null) {
+          final answer = snapshot.data()!['answer'];
+          await _peerConnection!.setRemoteDescription(
+            RTCSessionDescription(answer['sdp'], answer['type']),
+          );
         }
-      }
-    });
+      });
+
+      // Add ICE candidates
+      _peerConnection!.onIceCandidate = (candidate) {
+        roomRef.collection('callerCandidates').add({
+          'candidate': candidate.toMap(),
+        });
+      };
+
+      roomRef.collection('calleeCandidates').snapshots().listen((snapshot) {
+        for (var change in snapshot.docChanges) {
+          if (change.type == DocumentChangeType.added) {
+            final data = change.doc.data();
+            _peerConnection!.addCandidate(RTCIceCandidate(
+              data!['candidate']['candidate'],
+              data['candidate']['sdpMid'],
+              data['candidate']['sdpMLineIndex'],
+            ));
+          }
+        }
+      });
+    } catch (e) {
+      print('Error creating room: $e');
+    }
   }
 
   Future<void> _joinRoom() async {
-    final room = await _roomViewModel.getRoom(_roomId);
-    if (room == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Room not found')),
-      );
-      return;
-    }
-
-    final roomRef = _firestore.collection('rooms').doc(_roomId);
-
-    // Listen for offer and set it as remote description
-    roomRef.snapshots().listen((snapshot) async {
-      if (snapshot.data() != null && snapshot.data()!['offer'] != null) {
-        final offer = snapshot.data()!['offer'];
-        await _peerConnection!.setRemoteDescription(
-          RTCSessionDescription(offer['sdp'], offer['type']),
+    try {
+      final room = await _roomViewModel.getRoom(_roomId);
+      if (room == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Room not found')),
         );
-
-        // Create an answer and send it back
-        RTCSessionDescription answer = await _peerConnection!.createAnswer();
-        await _peerConnection!.setLocalDescription(answer);
-
-        // Save answer to Firestore
-        await roomRef.update({
-          'answer': {
-            'type': answer.type,
-            'sdp': answer.sdp,
-          },
-        });
+        return;
       }
-    });
 
-    // Add ICE candidates
-    _peerConnection!.onIceCandidate = (candidate) {
-      roomRef.collection('calleeCandidates').add({
-        'candidate': candidate.toMap(),
-      });
-    };
+      final roomRef =
+          FirebaseFirestore.instance.collection('rooms').doc(_roomId);
 
-    roomRef.collection('callerCandidates').snapshots().listen((snapshot) {
-      for (var change in snapshot.docChanges) {
-        if (change.type == DocumentChangeType.added) {
-          final data = change.doc.data();
-          _peerConnection!.addCandidate(RTCIceCandidate(
-            data!['candidate']['candidate'],
-            data['candidate']['sdpMid'],
-            data['candidate']['sdpMLineIndex'],
-          ));
+      // Listen for offer and set it as remote description
+      roomRef.snapshots().listen((snapshot) async {
+        if (snapshot.data() != null && snapshot.data()!['offer'] != null) {
+          final offer = snapshot.data()!['offer'];
+          await _peerConnection!.setRemoteDescription(
+            RTCSessionDescription(offer['sdp'], offer['type']),
+          );
+
+          // Create an answer and send it back
+          RTCSessionDescription answer = await _peerConnection!.createAnswer();
+          await _peerConnection!.setLocalDescription(answer);
+
+          // Save answer to Firestore
+          await roomRef.update({
+            'answer': {
+              'type': answer.type,
+              'sdp': answer.sdp,
+            },
+          });
         }
-      }
-    });
+      });
+
+      // Add ICE candidates
+      _peerConnection!.onIceCandidate = (candidate) {
+        roomRef.collection('calleeCandidates').add({
+          'candidate': candidate.toMap(),
+        });
+      };
+
+      roomRef.collection('callerCandidates').snapshots().listen((snapshot) {
+        for (var change in snapshot.docChanges) {
+          if (change.type == DocumentChangeType.added) {
+            final data = change.doc.data();
+            _peerConnection!.addCandidate(RTCIceCandidate(
+              data!['candidate']['candidate'],
+              data['candidate']['sdpMid'],
+              data['candidate']['sdpMLineIndex'],
+            ));
+          }
+        }
+      });
+    } catch (e) {
+      print('Error joining room: $e');
+    }
   }
 
   @override
