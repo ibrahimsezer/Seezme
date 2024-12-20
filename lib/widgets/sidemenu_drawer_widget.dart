@@ -29,7 +29,7 @@ class SideMenuDrawerWidget extends StatelessWidget {
           Container(
             height: sizeWidth * 0.4,
             decoration: BoxDecoration(
-              color: defaultTheme.primaryColor,
+              color: defaultThemeLight.primaryColor,
             ),
             child: Container(
               height: sizeWidth * 0.4,

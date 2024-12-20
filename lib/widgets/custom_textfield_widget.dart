@@ -31,7 +31,7 @@ class CustomTextField extends StatelessWidget {
           TextField(
             style: TextStyle(color: ConstColors.primaryColor),
             cursorErrorColor: errorTextStyle.color,
-            cursorColor: defaultTheme.primaryColor,
+            cursorColor: defaultThemeLight.primaryColor,
             controller: controller,
             obscureText: obscureText,
             decoration: InputDecoration(
@@ -39,12 +39,12 @@ class CustomTextField extends StatelessWidget {
               suffixIcon: Icon(icon),
               hintText: hintText,
               hintStyle: TextStyle(color: Colors.grey),
-              labelStyle: TextStyle(color: defaultTheme.primaryColor),
+              labelStyle: TextStyle(color: defaultThemeLight.primaryColor),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(5.0),
               ),
               focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: defaultTheme.primaryColor),
+                borderSide: BorderSide(color: defaultThemeLight.primaryColor),
                 borderRadius: BorderRadius.circular(5.0),
               ),
               filled: true,

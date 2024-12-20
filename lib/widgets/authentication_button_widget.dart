@@ -26,7 +26,7 @@ class AuthenticationButtonWidget extends StatelessWidget {
             ),
             elevation: WidgetStatePropertyAll(1),
             backgroundColor:
-                defaultTheme.textButtonTheme.style!.backgroundColor),
+                defaultThemeLight.textButtonTheme.style!.backgroundColor),
         onPressed: function,
         child: Padding(
           padding: PaddingSize.paddingMediumSize,

@@ -100,20 +100,18 @@ class PaddingSize {
 }
 
 class ConstColors {
-  static const Color primaryColor = Color(0xFF1B1311);
+  static const Color primaryColor = Color(0xFF1B1311); //dark change
   static const Color secondaryColor = Color(0xFFFEAE03);
-  static const Color surfaceColor = Color(0xFF1B1311);
+  static const Color surfaceColor = Color(0xFF1B1311); //dark change
   static const Color errorColor = Color(0xFFFFFFFF);
   static const Color onPrimaryColor = Color(0xFFFFFFFF);
-  static const Color onSecondaryColor = Color(0xFF1B1311);
+  static const Color onSecondaryColor = Color(0xFF1B1311); //dark change
   static const Color onSurfaceColor = Color(0xFFFFFFFF);
   static const Color onErrorColor = Color(0xFFFF3300);
-
-  static const Color foregroundColor = Color(0xFF1B1311);
+  static const Color foregroundColor = Color(0xFF1B1311); //dark change
   static const Color backgroundColor = Color(0xFFFEAE03);
-  static const Color fontColor = Color(0xFF1B1311);
-
-  static const Color dateColor = Color(0xFF1B1311);
+  static const Color fontColor = Color(0xFF1B1311); //dark change
+  static const Color dateColor = Color(0xFF1B1311); //dark change
 
   static const Color whiteColor = Color(0xFFFFFFFF);
   static const Color greyColor = Color(0xFF9E9E9E);
@@ -123,8 +121,6 @@ class ConstColors {
   static const Color blackLicorice = Color(0xFF1B1311);
   static const Color blackLicoriceDark = Color(0xFF191210);
   static const Color green = Color(0xFF10B90D);
-
-  static var white;
 }
 
 String defaultFontFamily = "Zona Pro Family";
@@ -140,14 +136,14 @@ TextStyle errorTextStyle = TextStyle(
   fontWeight: FontWeight.w200,
 );
 
-ThemeData defaultTheme = ThemeData(
+ThemeData defaultThemeLight = ThemeData(
   colorScheme: const ColorScheme(
-    primary: ConstColors.primaryColor,
+    primary: ConstColors.primaryColor, //dark change
     secondary: ConstColors.secondaryColor,
-    surface: ConstColors.surfaceColor,
+    surface: ConstColors.surfaceColor, //dark change
     error: ConstColors.errorColor,
     onPrimary: ConstColors.onPrimaryColor,
-    onSecondary: ConstColors.onSecondaryColor,
+    onSecondary: ConstColors.onSecondaryColor, //dark change
     onSurface: ConstColors.onSurfaceColor,
     onError: ConstColors.onErrorColor,
     brightness: Brightness.dark,
@@ -155,18 +151,60 @@ ThemeData defaultTheme = ThemeData(
   primaryColor: ConstColors.primaryColor,
   textButtonTheme: TextButtonThemeData(
     style: ButtonStyle(
-      foregroundColor:
-          WidgetStateProperty.all<Color>(ConstColors.foregroundColor),
+      foregroundColor: WidgetStateProperty.all<Color>(
+          ConstColors.foregroundColor), //dark change
       backgroundColor:
           WidgetStateProperty.all<Color>(ConstColors.backgroundColor),
     ),
   ),
   textTheme: TextTheme(
-    bodyLarge:
-        TextStyle(fontFamily: defaultFontFamily, color: ConstColors.fontColor),
-    bodyMedium:
-        TextStyle(fontFamily: defaultFontFamily, color: ConstColors.fontColor),
-    displayLarge:
-        TextStyle(fontFamily: defaultFontFamily, color: ConstColors.fontColor),
+    bodySmall: TextStyle(
+        fontSize: FontSize.textFontSize,
+        fontFamily: defaultFontFamily,
+        color: ConstColors.whiteColor), //dark change
+    bodyLarge: TextStyle(
+        fontSize: FontSize.titleFontSize,
+        fontFamily: defaultFontFamily,
+        color: ConstColors.fontColor), //dark change
+    bodyMedium: TextStyle(
+        fontSize: FontSize.textFontSize,
+        fontFamily: defaultFontFamily,
+        color: ConstColors.fontColor), //dark change
+    displayLarge: TextStyle(
+        fontFamily: defaultFontFamily,
+        color: ConstColors.fontColor), //dark change
+  ),
+);
+ThemeData defaultThemeDark = ThemeData(
+  colorScheme: const ColorScheme(
+    primary: ConstColors.primaryColor, //dark change
+    secondary: ConstColors.secondaryColor,
+    surface: ConstColors.surfaceColor, //dark change
+    error: ConstColors.errorColor,
+    onPrimary: ConstColors.onPrimaryColor,
+    onSecondary: ConstColors.onSecondaryColor, //dark change
+    onSurface: ConstColors.onSurfaceColor,
+    onError: ConstColors.onErrorColor,
+    brightness: Brightness.dark,
+  ),
+  primaryColor: ConstColors.primaryColor,
+  textButtonTheme: TextButtonThemeData(
+    style: ButtonStyle(
+      foregroundColor: WidgetStateProperty.all<Color>(
+          ConstColors.foregroundColor), //dark change
+      backgroundColor:
+          WidgetStateProperty.all<Color>(ConstColors.backgroundColor),
+    ),
+  ),
+  textTheme: TextTheme(
+    bodyLarge: TextStyle(
+        fontFamily: defaultFontFamily,
+        color: ConstColors.fontColor), //dark change
+    bodyMedium: TextStyle(
+        fontFamily: defaultFontFamily,
+        color: ConstColors.fontColor), //dark change
+    displayLarge: TextStyle(
+        fontFamily: defaultFontFamily,
+        color: ConstColors.fontColor), //dark change
   ),
 );

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:seezme/core/utility/constans/constants.dart';
 import 'package:seezme/core/viewmodels/chat_view_model.dart';
@@ -26,6 +27,12 @@ class MessageWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<ChatViewModel>(builder: (context, chatViewModel, child) {
       return GestureDetector(
+        onDoubleTap: () {
+          Clipboard.setData(ClipboardData(text: message));
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Message copied to clipboard')),
+          );
+        },
         onLongPress: () {
           showDialog(
             context: context,

@@ -31,10 +31,10 @@ class SendMessageWidget extends StatelessWidget {
             Expanded(
               child: TextField(
                   controller: _controller,
-                  cursorColor: defaultTheme.primaryColor,
+                  cursorColor: defaultThemeLight.primaryColor,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: defaultTheme.primaryColor,
+                    color: defaultThemeLight.primaryColor,
                   ),
                   decoration: InputDecoration(
                     hintText: 'Send a message...',

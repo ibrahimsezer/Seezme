@@ -61,14 +61,14 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
         automaticallyImplyLeading: false,
         title:
             const Text(Titles.mainTitle, style: TextStyle(color: Colors.white)),
-        backgroundColor: defaultTheme.primaryColor,
+        backgroundColor: defaultThemeLight.primaryColor,
         actions: [SideMenuButtonWidget()],
       ),
       endDrawer: SideMenuDrawerWidget(
         sizeWidth: sizeWidth,
         authService: _authService,
       ),
-      backgroundColor: defaultTheme.primaryColor,
+      backgroundColor: defaultThemeLight.primaryColor,
       body: Column(
         mainAxisSize: MainAxisSize.max,
         children: [

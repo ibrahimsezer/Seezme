@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:seezme/core/models/room_model.dart';
+import 'package:seezme/core/utility/constans/constants.dart';
+import 'package:seezme/core/viewmodels/room_view_model.dart';
 
 class VideoCallWidget extends StatefulWidget {
   @override
@@ -12,6 +16,7 @@ class _VideoCallWidgetState extends State<VideoCallWidget> {
   final RTCVideoRenderer _remoteRenderer = RTCVideoRenderer();
   RTCPeerConnection? _peerConnection;
   MediaStream? _localStream;
+  final RoomViewModel _roomViewModel = RoomViewModel();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   String _roomId = "";
   TextEditingController _roomIdController = TextEditingController();
@@ -77,15 +82,17 @@ class _VideoCallWidgetState extends State<VideoCallWidget> {
   }
 
   Future<void> _createRoom() async {
-    final roomRef = _firestore.collection('rooms').doc();
-    _roomId = roomRef.id;
+    final room = RoomModel(roomId: '', roomName: 'TestRoom');
+    _roomId = await _roomViewModel.createRoom(room);
 
     // Create offer
     RTCSessionDescription offer = await _peerConnection!.createOffer();
     await _peerConnection!.setLocalDescription(offer);
 
+    final roomRef = _firestore.collection('rooms').doc(_roomId);
+
     // Save offer to Firestore
-    await roomRef.set({
+    await roomRef.update({
       'offer': {
         'type': offer.type,
         'sdp': offer.sdp,
@@ -124,6 +131,14 @@ class _VideoCallWidgetState extends State<VideoCallWidget> {
   }
 
   Future<void> _joinRoom() async {
+    final room = await _roomViewModel.getRoom(_roomId);
+    if (room == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Room not found')),
+      );
+      return;
+    }
+
     final roomRef = _firestore.collection('rooms').doc(_roomId);
 
     // Listen for offer and set it as remote description
@@ -177,14 +192,33 @@ class _VideoCallWidgetState extends State<VideoCallWidget> {
       ),
       body: Column(
         children: [
-          TextField(
-            controller: _roomIdController,
-            decoration: InputDecoration(labelText: 'Enter Room ID'),
-            onChanged: (value) {
-              setState(() {
-                _roomId = value;
-              });
+          SizedBox(
+            width: 200,
+            height: 100,
+            child: TextField(
+              controller: _roomIdController,
+              style: defaultThemeLight.textTheme.bodySmall,
+              decoration: InputDecoration(
+                labelText: 'Enter Room ID',
+              ),
+              onChanged: (value) {
+                setState(() {
+                  _roomId = value;
+                });
+              },
+            ),
+          ),
+          GestureDetector(
+            onDoubleTap: () {
+              Clipboard.setData(ClipboardData(text: _roomId));
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Room ID copied to clipboard')),
+              );
             },
+            child: Text(
+              "Current RoomId: $_roomId",
+              style: TextStyle(color: ConstColors.whiteColor),
+            ),
           ),
           Expanded(
             child: RTCVideoView(_localRenderer, mirror: true),
