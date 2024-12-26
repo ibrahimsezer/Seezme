@@ -9,6 +9,8 @@ import 'package:seezme/widgets/chat_widget.dart';
 import 'package:seezme/widgets/send_message_widget.dart';
 import 'package:seezme/widgets/sidemenu_button_widget.dart';
 import 'package:seezme/widgets/sidemenu_drawer_widget.dart';
+import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({
@@ -23,6 +25,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   AuthService _authService = AuthService();
+  Timer? _inactivityTimer;
 
   @override
   void initState() {
@@ -30,8 +33,17 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
     final chatViewModel = Provider.of<ChatViewModel>(context, listen: false);
     final userViewModel = Provider.of<UserViewModel>(context, listen: false);
 
+    // Initialize presence system
+    AuthService().initUserPresence();
+
+    // Start listening to messages and users
     chatViewModel.listenToMessages();
-    userViewModel.fetchUsers();
+    userViewModel.listenToUsers();
+
+    // Set up periodic check for inactive users
+    _inactivityTimer = Timer.periodic(Duration(minutes: 1), (timer) {
+      userViewModel.checkInactiveUsers();
+    });
 
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -44,6 +56,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
 
   @override
   void dispose() {
+    _inactivityTimer?.cancel();
     Provider.of<ChatViewModel>(context, listen: false).dispose();
     WidgetsBinding.instance.removeObserver(this);
     _controller.dispose();
@@ -53,12 +66,30 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
-      Provider.of<ChatViewModel>(context, listen: false).listenToMessages();
-      Provider.of<UserViewModel>(context, listen: false).fetchUsers();
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        scrollToBottom(_scrollController, context);
-      });
+    final userViewModel = Provider.of<UserViewModel>(context, listen: false);
+    final currentUser = FirebaseAuth.instance.currentUser;
+
+    switch (state) {
+      case AppLifecycleState.resumed:
+        if (currentUser != null) {
+          userViewModel.updateUserStatus(
+              currentUser.uid, Status.statusAvailable);
+        }
+        break;
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.paused:
+        if (currentUser != null) {
+          userViewModel.updateUserStatus(currentUser.uid, Status.statusIdle);
+        }
+        break;
+      case AppLifecycleState.detached:
+        if (currentUser != null) {
+          userViewModel.updateUserStatus(currentUser.uid, Status.statusOffline);
+        }
+        break;
+      case AppLifecycleState.hidden:
+        // TODO: Handle this case.
+        throw UnimplementedError();
     }
   }
 

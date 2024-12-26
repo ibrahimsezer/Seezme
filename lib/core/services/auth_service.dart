@@ -34,6 +34,7 @@ class AuthService {
     try {
       await _auth.signInWithEmailAndPassword(email: email, password: password);
       await _updateStatus(Status.statusAvailable);
+      await initUserPresence();
     } catch (e) {
       throw Exception("Login failed: $e");
     }
@@ -41,7 +42,10 @@ class AuthService {
 
   Future<void> signOut() async {
     try {
-      await _updateStatus(Status.statusOffline);
+      final user = _auth.currentUser;
+      if (user != null) {
+        await _updateStatus(Status.statusOffline);
+      }
       await _auth.signOut();
     } catch (e) {
       throw Exception("Logout failed: $e");
@@ -109,5 +113,28 @@ class AuthService {
     }
 
     return username;
+  }
+
+  Future<void> initUserPresence() async {
+    final user = _auth.currentUser;
+    if (user != null) {
+      final userStatusRef = _firestore.collection("users").doc(user.uid);
+
+      _firestore.collection('.info/connected').doc().snapshots().listen((snap) {
+        if (snap.exists) {
+          userStatusRef.update({
+            "status": Status.statusAvailable,
+            "lastSeen": FieldValue.serverTimestamp(),
+          });
+        } else {
+          userStatusRef.update({
+            "status": Status.statusOffline,
+            "lastSeen": FieldValue.serverTimestamp(),
+          });
+        }
+      }, onError: (error) {
+        print("Error setting user presence: $error");
+      });
+    }
   }
 }
