@@ -161,7 +161,7 @@ ThemeData defaultThemeLight = ThemeData(
     bodySmall: TextStyle(
         fontSize: FontSize.textFontSize,
         fontFamily: defaultFontFamily,
-        color: ConstColors.whiteColor), //dark change
+        color: ConstColors.fontColor), //dark change
     bodyLarge: TextStyle(
         fontSize: FontSize.titleFontSize,
         fontFamily: defaultFontFamily,
