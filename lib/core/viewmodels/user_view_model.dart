@@ -84,4 +84,9 @@ class UserViewModel with ChangeNotifier {
       print('Error checking inactive users: $e');
     }
   }
+
+  Future<void> updateStatus(String newStatus) async {
+    _status = newStatus;
+    notifyListeners();
+  }
 }

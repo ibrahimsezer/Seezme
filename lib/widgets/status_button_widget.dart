@@ -21,7 +21,7 @@ class StatusButtonWidget extends StatelessWidget {
             String uid = FirebaseAuth.instance.currentUser?.uid ?? "";
             if (uid != "") {
               await userViewModel.updateUserStatus(uid, value);
-              await userViewModel.fetchUsers();
+              userViewModel.listenToUsers();
             } else {
               showErrorSnackbar("Check your internet connection", context);
             }
