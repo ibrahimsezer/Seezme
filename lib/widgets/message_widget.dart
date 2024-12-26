@@ -101,7 +101,7 @@ class MessageWidget extends StatelessWidget {
                         message,
                         style: const TextStyle(
                           color: ConstColors.fontColor,
-                          fontSize: FontSize.textFontSize,
+                          fontSize: FontSize.textFontSizeMedium,
                           fontWeight: FontWeight.bold,
                         ),
                         maxLines: null,

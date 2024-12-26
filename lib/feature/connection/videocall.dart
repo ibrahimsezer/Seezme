@@ -572,11 +572,23 @@ class _VideoCallWidgetState extends State<VideoCallWidget> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  'Video Call',
-                  style: defaultThemeLight.textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+                Column(
+                  spacing: 5,
+                  children: [
+                    Text(
+                      'Video Call',
+                      style: defaultThemeLight.textTheme.displayLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      textAlign: TextAlign.center,
+                      "(Currently only local call is supported)",
+                      style: defaultThemeLight.textTheme.bodySmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    )
+                  ],
                 ),
                 SizedBox(height: 24),
                 // New Call Button
@@ -623,8 +635,8 @@ class _VideoCallWidgetState extends State<VideoCallWidget> {
                 // Join Existing Call Section
                 Text(
                   'Join Existing Call',
-                  style: defaultThemeLight.textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w500,
+                  style: defaultThemeLight.textTheme.displayLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
                 SizedBox(height: 16),

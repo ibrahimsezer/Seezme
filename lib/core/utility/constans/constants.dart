@@ -84,7 +84,8 @@ class RegisterType {
 class FontSize {
   static const double dateFontSize = 10.0;
   static const double usernameFontSize = 16.0;
-  static const double textFontSize = 16.0;
+  static const double textFontSizeMedium = 16.0;
+  static const double textFontSizeSmall = 12.0;
   static const double buttonTextFontSize = 16.0;
   static const double statusFontSize = 12.0;
   static const double emailFontSize = 12.0;
@@ -159,20 +160,25 @@ ThemeData defaultThemeLight = ThemeData(
   ),
   textTheme: TextTheme(
     bodySmall: TextStyle(
-        fontSize: FontSize.textFontSize,
+        fontSize: FontSize.textFontSizeSmall,
         fontFamily: defaultFontFamily,
+        fontWeight: FontWeight.bold,
         color: ConstColors.fontColor), //dark change
     bodyLarge: TextStyle(
         fontSize: FontSize.titleFontSize,
         fontFamily: defaultFontFamily,
+        fontWeight: FontWeight.bold,
         color: ConstColors.fontColor), //dark change
     bodyMedium: TextStyle(
-        fontSize: FontSize.textFontSize,
+        fontSize: FontSize.textFontSizeMedium,
+        fontWeight: FontWeight.bold,
         fontFamily: defaultFontFamily,
         color: ConstColors.fontColor), //dark change
     displayLarge: TextStyle(
         fontFamily: defaultFontFamily,
-        color: ConstColors.fontColor), //dark change
+        fontWeight: FontWeight.bold,
+        color: ConstColors.fontColor),
+    //dark change
   ),
 );
 ThemeData defaultThemeDark = ThemeData(

@@ -174,7 +174,7 @@ class _ZoomableCard2State extends State<ZoomableCard2> {
                     Text(
                       widget.status,
                       style: TextStyle(
-                        fontSize: FontSize.textFontSize,
+                        fontSize: FontSize.textFontSizeMedium,
                         fontFamily: defaultFontFamily,
                         fontWeight: FontWeight.bold,
                         color: widget.status == Status.statusAvailable
