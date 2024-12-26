@@ -73,21 +73,39 @@ class SendMessageWidget extends StatelessWidget {
                     ),
                   ),
                   onSubmitted: (value) async {
-                    if (_controller.text != "") {
-                      await Provider.of<ChatViewModel>(context, listen: false)
-                          .sendMessage(
-                        ChatModel(
-                          id: await _authService.auth.currentUser.uid,
-                          sender: await _authService.getUsername(),
-                          message: _controller.text,
-                          type: 'text',
-                          createdAt: Timestamp.now(),
-                        ),
-                      );
-                      _controller.clear();
-                      scrollToBottom(_scrollController, context);
-                    } else {
-                      return null;
+                    if (_controller.text.isNotEmpty) {
+                      try {
+                        await Provider.of<ChatViewModel>(context, listen: false)
+                            .sendMessage(
+                          ChatModel(
+                            id: await _authService.auth.currentUser.uid,
+                            sender: await _authService.getUsername(),
+                            message: _controller.text,
+                            type: 'text',
+                            createdAt: Timestamp.now(),
+                          ),
+                        );
+                        _controller.clear();
+
+                        // Ensure scroll happens after message is sent
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          if (_scrollController.hasClients) {
+                            _scrollController.animateTo(
+                              _scrollController.position.maxScrollExtent,
+                              duration: Duration(milliseconds: 300),
+                              curve: Curves.easeOut,
+                            );
+                          }
+                        });
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                                'Failed to send message. Please try again.'),
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
+                      }
                     }
                   }),
             ),
@@ -99,21 +117,39 @@ class SendMessageWidget extends StatelessWidget {
               child: IconButton(
                   icon: const Icon(Icons.send, color: Colors.white),
                   onPressed: () async {
-                    if (_controller.text != "") {
-                      await Provider.of<ChatViewModel>(context, listen: false)
-                          .sendMessage(
-                        ChatModel(
-                          id: await _authService.auth.currentUser.uid,
-                          sender: await _authService.getUsername(),
-                          message: _controller.text,
-                          type: 'text',
-                          createdAt: Timestamp.now(),
-                        ),
-                      );
-                      _controller.clear();
-                      scrollToBottom(_scrollController, context);
-                    } else {
-                      return null;
+                    if (_controller.text.isNotEmpty) {
+                      try {
+                        await Provider.of<ChatViewModel>(context, listen: false)
+                            .sendMessage(
+                          ChatModel(
+                            id: await _authService.auth.currentUser.uid,
+                            sender: await _authService.getUsername(),
+                            message: _controller.text,
+                            type: 'text',
+                            createdAt: Timestamp.now(),
+                          ),
+                        );
+                        _controller.clear();
+
+                        // Ensure scroll happens after message is sent
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          if (_scrollController.hasClients) {
+                            _scrollController.animateTo(
+                              _scrollController.position.maxScrollExtent,
+                              duration: Duration(milliseconds: 300),
+                              curve: Curves.easeOut,
+                            );
+                          }
+                        });
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                                'Failed to send message. Please try again.'),
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
+                      }
                     }
                   }),
             ),

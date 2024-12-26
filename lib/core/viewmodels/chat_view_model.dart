@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:seezme/core/models/chat_model.dart';
@@ -6,20 +8,33 @@ class ChatViewModel with ChangeNotifier {
   final _firestore = FirebaseFirestore.instance;
   List<ChatModel> _messages = [];
   List<ChatModel> _allChatList = [];
+  StreamSubscription<QuerySnapshot>? _chatSubscription;
+  bool _shouldScrollToBottom = false;
 
   List<ChatModel> get messages => _messages;
   List<ChatModel> get allChatList => _allChatList;
+  bool get shouldScrollToBottom => _shouldScrollToBottom;
 
   void listenToMessages() {
-    _firestore
+    _chatSubscription?.cancel();
+
+    _chatSubscription = _firestore
         .collection('chats')
         .orderBy('createdAt', descending: false)
         .snapshots()
         .listen((snapshot) {
       _messages = snapshot.docs
-          .map((doc) => ChatModel.fromFirestore(doc.data()))
+          .map((doc) => ChatModel.fromFirestore({
+                ...doc.data(),
+                'id': doc.id,
+              }))
           .toList();
+
+      _messages.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+
       notifyListeners();
+    }, onError: (error) {
+      print('Error listening to messages: $error');
     });
   }
 
@@ -33,22 +48,37 @@ class ChatViewModel with ChangeNotifier {
   }
 
   Future<void> sendMessage(ChatModel chat) async {
-    await _firestore.collection('chats').add(chat.toFirestore());
-    fetchMessages();
+    try {
+      await _firestore.collection('chats').add(chat.toFirestore());
+    } catch (e) {
+      print('Error sending message: $e');
+      throw e;
+    }
   }
 
   Future<void> deleteMessage(String messageId) async {
-    await _firestore.collection('chats').doc(messageId).delete();
-    fetchMessages();
+    try {
+      await _firestore.collection('chats').doc(messageId).delete();
+    } catch (e) {
+      print('Error deleting message: $e');
+      throw e;
+    }
   }
 
   Future<void> deleteAllMessage() async {
-    await _firestore.collection('chats').get().then((snapshot) {
-      for (DocumentSnapshot ds in snapshot.docs) {
-        ds.reference.delete();
+    try {
+      WriteBatch batch = _firestore.batch();
+      var snapshots = await _firestore.collection('chats').get();
+
+      for (var doc in snapshots.docs) {
+        batch.delete(doc.reference);
       }
-    });
-    fetchMessages();
+
+      await batch.commit();
+    } catch (e) {
+      print('Error deleting all messages: $e');
+      throw e;
+    }
   }
 
 //------------------  All Chats ------------------
@@ -82,5 +112,15 @@ class ChatViewModel with ChangeNotifier {
     await chatDoc.set({
       'createdAt': Timestamp.now(),
     });
+  }
+
+  void resetScrollFlag() {
+    _shouldScrollToBottom = false;
+  }
+
+  @override
+  void dispose() {
+    _chatSubscription?.cancel();
+    super.dispose();
   }
 }

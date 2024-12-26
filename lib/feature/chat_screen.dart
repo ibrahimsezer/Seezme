@@ -29,7 +29,8 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
     super.initState();
     final chatViewModel = Provider.of<ChatViewModel>(context, listen: false);
     final userViewModel = Provider.of<UserViewModel>(context, listen: false);
-    chatViewModel.fetchMessages();
+
+    chatViewModel.listenToMessages();
     userViewModel.fetchUsers();
 
     WidgetsBinding.instance.addObserver(this);
@@ -42,9 +43,18 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
   }
 
   @override
+  void dispose() {
+    Provider.of<ChatViewModel>(context, listen: false).dispose();
+    WidgetsBinding.instance.removeObserver(this);
+    _controller.dispose();
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      Provider.of<ChatViewModel>(context, listen: false).fetchMessages();
+      Provider.of<ChatViewModel>(context, listen: false).listenToMessages();
       Provider.of<UserViewModel>(context, listen: false).fetchUsers();
       WidgetsBinding.instance.addPostFrameCallback((_) {
         scrollToBottom(_scrollController, context);

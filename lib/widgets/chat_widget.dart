@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:seezme/core/viewmodels/chat_view_model.dart';
 import 'package:seezme/widgets/message_widget.dart';
 
-class ChatWidget extends StatelessWidget {
+class ChatWidget extends StatefulWidget {
   const ChatWidget({
     super.key,
     required ScrollController scrollController,
@@ -12,14 +12,31 @@ class ChatWidget extends StatelessWidget {
   final ScrollController _scrollController;
 
   @override
+  State<ChatWidget> createState() => _ChatWidgetState();
+}
+
+class _ChatWidgetState extends State<ChatWidget> {
+  @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         Expanded(
           child: Consumer<ChatViewModel>(
             builder: (context, chatVM, child) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                // Always scroll to bottom when messages change
+                if (widget._scrollController.hasClients &&
+                    chatVM.messages.isNotEmpty) {
+                  widget._scrollController.animateTo(
+                    widget._scrollController.position.maxScrollExtent,
+                    duration: Duration(milliseconds: 300),
+                    curve: Curves.easeOut,
+                  );
+                }
+              });
+
               return ListView.builder(
-                controller: _scrollController,
+                controller: widget._scrollController,
                 reverse: false,
                 itemCount: chatVM.messages.length,
                 itemBuilder: (context, index) {
@@ -34,7 +51,6 @@ class ChatWidget extends StatelessWidget {
                     );
                   } else if (message.type == 'media') {
                     return Image.network(
-                      //todo return to image message model
                       message.message,
                       fit: BoxFit.cover,
                     );
